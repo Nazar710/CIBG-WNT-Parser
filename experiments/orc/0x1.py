@@ -23,3 +23,6 @@ with open('test.pdf', 'w+b') as f:
     f.write(pdf) # pdf type is bytes by default
 
 
+"""
+TODO try to extract tables 
+"""
