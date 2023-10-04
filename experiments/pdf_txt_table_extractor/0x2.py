@@ -6,22 +6,21 @@ can we turn simple image into pdf and then extract table from the now accessable
 
 """
 
-image = Image.open('4.png')
+for i in range(1,5):
+    
+    image = Image.open(str(i)+'.png')
 
 
-print(pytesseract.image_to_boxes(image)) #gives the location of items
-
-#searchable pdf
-pdf = pytesseract.image_to_pdf_or_hocr(image, extension='pdf')
-with open('test.pdf', 'w+b') as f:
-    f.write(pdf) # pdf type is bytes by default
+    #searchable pdf
+    pdf = pytesseract.image_to_pdf_or_hocr(image, extension='pdf')
+    with open('test.pdf', 'w+b') as f:
+        f.write(pdf) # pdf type is bytes by default
 
 
 
-tables = tabula.read_pdf("test.pdf", pages="all")
+    tables = tabula.read_pdf("test.pdf", pages="all")
 
-tables[0].head(10)
+    print(str(i)," : ",tables, "\n")
 
-"""
-no this doesnt work.
-"""
+
+
