@@ -19,3 +19,6 @@ results = reader.readtext(image_path)
 # Print the OCR results
 for (bbox, text, prob) in results:
     print(f'Text: {text}, Probability: {prob}')
+
+
+#TODO try to extract tables
