@@ -17,8 +17,12 @@ https://maxbachmann.github.io/Levenshtein/
 pip install levenshtein
 """
 
-A ="test test test"
-B = "lol lol lol lol test test lol lol lol  test test"
+# A ="test test test"
+# B = "lol lol lol lol test test lol lol lol  test test"
+
+
+A ="test test hello"
+B = "lol lol lol lol test test lol lol lol"
 dist = Levenshtein.distance(A,B)
 
 mb = Levenshtein.matching_blocks(Levenshtein.editops(A, B),A,B)
