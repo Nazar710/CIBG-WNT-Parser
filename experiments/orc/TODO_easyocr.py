@@ -3,7 +3,7 @@ from PIL import Image
 
 """
 (Sander Stokhof)
-
+(zijiandongkurt )
 https://github.com/JaidedAI/EasyOCR
 
 using easyocr to do ocr
