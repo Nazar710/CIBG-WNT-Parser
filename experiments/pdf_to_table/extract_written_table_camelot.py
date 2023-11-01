@@ -1,5 +1,14 @@
 import camelot
 import pandas as pd
+
+"""
+(Sander Stokhof)
+
+using camelot to extrat table from pdf (text)
+
+"""
+
+
 """
 https://camelot-py.readthedocs.io/en/master/
 https://pypi.org/project/tabula-py/

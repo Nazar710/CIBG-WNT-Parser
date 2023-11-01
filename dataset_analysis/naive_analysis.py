@@ -2,6 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import seaborn as sbn
 
+"""
+(Sander Stokhof)
+gets the labeled data and turns it into a bar plot.
+"""
+
+
 if __name__ == "__main__":
     df = pd.read_excel("data_labeling.xlsx")
 

@@ -3,6 +3,12 @@ import pytesseract
 import camelot
 import pandas as pd 
 """
+(Sander Stokhof)
+
+using pytesseract together with camelot to turn png's (of tables) into tables.
+"""
+
+"""
 can we turn simple image into pdf and then extract table from the now accessable table???
 
 """

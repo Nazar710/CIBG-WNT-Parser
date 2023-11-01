@@ -2,6 +2,13 @@ from PIL import Image
 import pytesseract
 import matplotlib.pyplot as plt 
 """
+(Sander Stokhof)
+using pytesseract to do OCR
+"""
+
+
+
+"""
 https://stackoverflow.com/questions/50951955/pytesseract-tesseractnotfound-error-tesseract-is-not-installed-or-its-not-i
 
 see install section:

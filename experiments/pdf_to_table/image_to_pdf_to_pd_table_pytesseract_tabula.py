@@ -1,6 +1,13 @@
 from PIL import Image
 import pytesseract
 import tabula
+
+"""
+(Sander Stokhof)
+
+using pytesseract together with tabula to turn png's (of tables) into tables.
+"""
+
 """
 can we turn simple image into pdf and then extract table from the now accessable table???
 

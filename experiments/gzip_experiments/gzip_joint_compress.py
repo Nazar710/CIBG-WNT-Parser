@@ -1,4 +1,15 @@
 import gzip 
+
+"""
+(Sander Stokhof)
+arXiv: "Less is More: Parameter-Free Text Classification with Gzip"
+
+subset pruning experiment.
+
+Jointly compress sentences together with gzip to see how the length of the compression behave for different overlaps.
+Where we looking at differences in joint compression lengths of different words
+and if length extension changes things
+"""
 a = "test"
 b = "hello"
 c = "test test"

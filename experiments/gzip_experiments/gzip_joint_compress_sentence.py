@@ -1,7 +1,14 @@
 import gzip 
 
 """
-subset pruning experiment
+(Sander Stokhof)
+arXiv: "Less is More: Parameter-Free Text Classification with Gzip"
+
+subset pruning experiment.
+
+Jointly compress sentences together with gzip to see how the length of the compression behave for different overlaps.
+Where we looking at more complex sentences and specificially how well it is able 
+to recognize that something is contained (or a subset of) in something else.
 """
 
 def jointy_compress(*elem:str) -> bytes:

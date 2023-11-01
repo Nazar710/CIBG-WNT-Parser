@@ -1,13 +1,15 @@
 import gzip 
 import Levenshtein
 
-def jointy_compress(*elem:str) -> bytes:
-    """
-    takes in N strings concatenates them together and 
-    compresses them with gzip
-    """
-    string = " ".join(elem) #join with space seperator
-    return gzip.compress(bytes(string,encoding="utf-8"))
+"""
+(Sander Stokhof)
+
+using levenshtein to align subset of a text with the matching subset of the text.
+where the subset is being isolated with brackets. 
+
+"""
+
+
 
 
 

@@ -1,4 +1,11 @@
 from img2table.document import Image
+
+"""
+(Sander Stokhof)
+using img2table to do ocr
+"""
+
+
 """
 img2table
 https://github.com/xavctn/img2table
@@ -20,7 +27,7 @@ extracted_tables = doc.extract_tables(ocr=ocr,
                                       implicit_rows=False,
                                       borderless_tables=False,
                                       min_confidence=50)
-
+                                      
 """
 
 def getTable(filename,implicit_rows:bool=False,borderless_tables:bool=False,path:str = "/home/hal9000/Documents/github/CIBG-WNT-Parser/experiments/orc/") -> list:

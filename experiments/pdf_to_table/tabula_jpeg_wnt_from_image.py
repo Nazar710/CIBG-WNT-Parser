@@ -3,7 +3,11 @@ import pytesseract
 import tabula
 import pandas as pd 
 
+"""
+(Sander Stokhof)
 
+using pytesseract together with tabula to turn jpeg into table (but specifically test for wnt example)
+"""
 
  
 image = Image.open("5.jpeg")

@@ -4,7 +4,21 @@ import camelot
 import pandas as pd 
 
 
+"""
+(Sander Stokhof)
+
+using camelot together with pytesseract to extract tables from jpegs
+"""
+
 def extract_table(file_path:str,page_number:str="1") -> list[pd.DataFrame]:
+    """
+    @param 
+        file_path:string
+        page_number:string (the page number)
+    
+    @return 
+        list[pd.DataFrame] for each table 
+    """
     tables = camelot.read_pdf(file_path,pages=page_number)
     
     return [table.df for table in tables]

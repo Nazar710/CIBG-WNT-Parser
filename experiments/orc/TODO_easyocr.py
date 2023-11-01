@@ -2,8 +2,14 @@ import easyocr
 from PIL import Image
 
 """
+(Sander Stokhof)
+
 https://github.com/JaidedAI/EasyOCR
+
+using easyocr to do ocr
 """
+
+
 
 import easyocr
 
