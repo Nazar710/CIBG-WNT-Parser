@@ -52,13 +52,4 @@ class extractor():
         return self
 
 if __name__ == "__main__":
-    # extr = extractor("./whitespace2.pdf")      
-    # tables = extr.extract_gridbased({"vertical_strategy":"text","horizontal_strategy":"text"},[23])
-
-    # for table in tables:
-    #     print("\n")
-    #     table.debug()
-    #     exit()
-
-    extr = extractor("./scanned.pdf")
-    print(extr.extract_text())
+    pass 
