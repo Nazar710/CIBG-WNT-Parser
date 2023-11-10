@@ -6,8 +6,8 @@ import thefuzz
 import os 
 from typing import Generator
 import pandas as pd 
-
-
+from functools import partial
+import numpy as np 
 
 class table_format():
     def __init__(self,table:pdfplumber.table.Table,page:pdfplumber.page.Page) -> None:
@@ -58,9 +58,46 @@ class extractor():
         return self
 
 
-def findtable(table_list:list[table_format]):
-    pass 
 
+def tableListToDataFrameList(table_list:list[table_format]) -> list[pd.DataFrame]:
+    return [table.table() for table in table_list]
+
+
+def isInTableElement(table_elem:str,targetWord:str,threshold:float) -> bool:
+    # print("table_elem: ",table_elem) 
+    # print("targetWord: ",targetWord)
+    # print("threshold: ",threshold)
+    """
+    TODO use fuzzy and alignment (with treshold) instead of naive matching
+    """
+
+    if(table_elem is None):
+        return False
+    else:
+        return targetWord in table_elem
+
+def findInTable(table:pd.DataFrame,targetWord:str,threshold:float) -> tuple[np.Array,np.Array]:
+    """
+    tries to find the alignment with a targetword and use fuzzy matching to see how similar the words are.
+    fuzzy matching has a value in range [0,1].
+    it's more than the threshold we will accept that there is word at that position.
+
+    returns (xpos_Array,ypos_Array) for each element in the table that is in the right format
+    """
+
+    masked_table = table.map(partial(isInTableElement,threshold=threshold,targetWord=targetWord)).to_numpy()
+
+    return masked_table.nonzero()
+
+
+def findtable(table_list:list[table_format]):
+    table_list = tableListToDataFrameList(table_list)    
+    
+    for table in table_list:
+
+        findInTable(table,"Gegevens 2020",threshold=0.5)
+
+        exit() #TODO remove when findInTable and dependencies are done
 
 def pathIterator(directory_files:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> Generator:
     """
@@ -73,6 +110,12 @@ def pathIterator(directory_files:str="example_pdfs",accepted_formats:list[str]=[
 
 
 if __name__ == "__main__":
-    itr = pathIterator()
+    table_page_numbers = {"wnt_grid.pdf":[39,40],"wnt_grid2.pdf":[35,36]}    
+    
+    for path in pathIterator():
+        current_filename =path.split("/")[-1]
+        if(current_filename in table_page_numbers.keys()):
+            table_list = extractor(path).extract_gridbased(page_nums=table_page_numbers[current_filename])
 
-    extr = extractor("./example_pdfs/wnt_grid.pdf") 
+            findtable(table_list)
+            
