@@ -2,6 +2,12 @@ import pdfplumber
 import pandas as pd 
 import matplotlib.pyplot as plt 
 import Levenshtein
+import thefuzz
+import os 
+from typing import Generator
+import pandas as pd 
+
+
 
 class table_format():
     def __init__(self,table:pdfplumber.table.Table,page:pdfplumber.page.Page) -> None:
@@ -52,6 +58,21 @@ class extractor():
         return self
 
 
+def findtable(table_list:list[table_format]):
+    pass 
+
+
+def pathIterator(directory_files:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> Generator:
+    """
+    returns an iterator for all the file paths to a directory
+    """
+    root_path = os.path.join(os.curdir,directory_files)
+    for file_path in os.listdir(root_path):
+        if(file_path.split(".")[-1] in accepted_formats):
+            yield os.path.join(root_path,file_path)
+
 
 if __name__ == "__main__":
-    pass 
+    itr = pathIterator()
+
+    extr = extractor("./example_pdfs/wnt_grid.pdf") 
