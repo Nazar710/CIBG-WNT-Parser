@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
     #wnt extraction test
     table_page_numbers = {"wnt_grid.pdf":[39,40],"wnt_grid2.pdf":[35,36]}    
-    analyser = tableAnalyser()
+    analyser = tableAnalyser(download_spacy=download_spacy)
 
     for path in analyser.pathIterator():
         current_filename =path.split("/")[-1]
