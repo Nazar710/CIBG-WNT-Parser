@@ -75,13 +75,15 @@ class tableAnalyser():
     fuzz.token_set_ratio
 
     """
-    def __init__(self,matching_func:Callable=fuzz.ratio,download_spacy:bool=True) -> None:
+    def __init__(self,matching_func:Callable=fuzz.ratio,entityTypeReplacement:bool=True,download_spacy:bool=True) -> None:
         self.matching_func = matching_func
+        self.entityTypeReplacement = entityTypeReplacement #maps entities in text comparisons to their entity type instead of their value. (so you can compare groups instead of being overfocust on individual instanced of an entity goup)
 
         if(download_spacy):
             spacy.cli.download("nl_core_news_sm")
 
         self.NER = spacy.load("nl_core_news_sm")
+
 
     def isInTableElement(self,table_elem:str,targetWord:str,threshold:float) -> bool:
         """
@@ -92,8 +94,17 @@ class tableAnalyser():
         if(table_elem is None):
             return False 
         
+
+        if(self.entityTypeReplacement):
+            #TODO since there is a distinction made between CARDINALITY and MONEY labels (and similar instances) it might be necisary to find groups of entities labels and map them to the same thing
+
+            table_elem = self.entity_replacer(table_elem)[1]
+            targetWord = self.entity_replacer(targetWord)[1]
+        
         table_elem = table_elem.lower()
         targetWord = targetWord.lower()
+        print(table_elem)
+        print(targetWord)
 
         if(self.matching_func(table_elem,targetWord) >= threshold):
             return True
@@ -107,6 +118,7 @@ class tableAnalyser():
 
         returns (xpos_Array,ypos_Array) for each element in the table that is in the right format
         """
+
         masked_table = table.map(partial(self.isInTableElement,threshold=threshold,targetWord=targetWord)).to_numpy()
 
         return masked_table.nonzero()
