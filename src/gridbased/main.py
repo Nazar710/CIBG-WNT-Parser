@@ -76,7 +76,7 @@ def isInTableElement(table_elem:str,targetWord:str,threshold:float) -> bool:
     else:
         return targetWord in table_elem
 
-def findInTable(table:pd.DataFrame,targetWord:str,threshold:float) -> tuple[np.Array,np.Array]:
+def findInTable(table:pd.DataFrame,targetWord:str,threshold:float) -> tuple[np.array,np.array]: #returns (xpos_array,ypos_array)
     """
     tries to find the alignment with a targetword and use fuzzy matching to see how similar the words are.
     fuzzy matching has a value in range [0,1].
@@ -84,7 +84,6 @@ def findInTable(table:pd.DataFrame,targetWord:str,threshold:float) -> tuple[np.A
 
     returns (xpos_Array,ypos_Array) for each element in the table that is in the right format
     """
-
     masked_table = table.map(partial(isInTableElement,threshold=threshold,targetWord=targetWord)).to_numpy()
 
     return masked_table.nonzero()
@@ -98,6 +97,7 @@ def findtable(table_list:list[table_format]):
         findInTable(table,"Gegevens 2020",threshold=0.5)
 
         exit() #TODO remove when findInTable and dependencies are done
+
 
 def pathIterator(directory_files:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> Generator:
     """
