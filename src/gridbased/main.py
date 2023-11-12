@@ -84,6 +84,11 @@ class tableAnalyser():
         self.NER = spacy.load("nl_core_news_sm")
 
     def isInTableElement(self,table_elem:str,targetWord:str,threshold:float) -> bool:
+        """
+        checks if a word is close enough to a target word given some treshold measured.
+        Where the distance is measured by an by the instance provided matching function. (self.matching_fun)
+        """
+
         if(table_elem is None):
             return False 
         
