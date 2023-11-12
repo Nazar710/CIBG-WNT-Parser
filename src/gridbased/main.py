@@ -75,7 +75,7 @@ class tableAnalyser():
     fuzz.token_set_ratio
 
     """
-    def __init__(self,matching_func:Callable=fuzz.ratio,entityTypeReplacement:bool=True,download_spacy:bool=True) -> None:
+    def __init__(self,matching_func:Callable=fuzz.ratio,entityTypeReplacement:bool=True,download_spacy:bool=False) -> None:
         self.matching_func = matching_func
         self.entityTypeReplacement = entityTypeReplacement #maps entities in text comparisons to their entity type instead of their value. (so you can compare groups instead of being overfocust on individual instanced of an entity goup)
 
@@ -93,18 +93,20 @@ class tableAnalyser():
 
         if(table_elem is None):
             return False 
-        
+
+        #first lower to reduce the risk of miss binding of entities.
+        #since:  
+        #        gegevens 2020 -> gegevens [date].  
+        #        Gegevens 2020 -> [data]
+
+        table_elem = table_elem.lower()
+        targetWord = targetWord.lower()
 
         if(self.entityTypeReplacement):
             #TODO since there is a distinction made between CARDINALITY and MONEY labels (and similar instances) it might be necisary to find groups of entities labels and map them to the same thing
 
             table_elem = self.entity_replacer(table_elem)[1]
             targetWord = self.entity_replacer(targetWord)[1]
-        
-        table_elem = table_elem.lower()
-        targetWord = targetWord.lower()
-        print(table_elem)
-        print(targetWord)
 
         if(self.matching_func(table_elem,targetWord) >= threshold):
             return True
@@ -142,7 +144,7 @@ class tableAnalyser():
         new_text = ""
         for text_pos,num in enumerate(mask):
             if(num < current_num):
-                new_text += labels[current_label_index]
+                new_text += "["+labels[current_label_index]+"]"
                 current_label_index += 1
             
             if(num == 1):
@@ -185,9 +187,6 @@ if __name__ == "__main__":
     #param 
     download_spacy = True 
 
-    #download dependencies
-
-
     #wnt extraction test
     table_page_numbers = {"wnt_grid.pdf":[39,40],"wnt_grid2.pdf":[35,36]}    
     analyser = tableAnalyser()
@@ -197,4 +196,4 @@ if __name__ == "__main__":
         if(current_filename in table_page_numbers.keys()):
             table_list = extractor(path).extract_gridbased(page_nums=table_page_numbers[current_filename])
 
-            print(analyser.findtable(table_list,"gegevens",0.6))
+            print(analyser.findtable(table_list,"gegevens 2020",0.6))
