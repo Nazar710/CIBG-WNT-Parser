@@ -8,6 +8,7 @@ from functools import partial
 import numpy as np 
 from thefuzz import fuzz
 from typing import Callable
+import spacy
 
 class table_format():
     """
@@ -42,6 +43,7 @@ class extractor():
             else:
                 return [page.extract_text(x_tolerance=x_tolerance, y_tolerance=y_tolerance, layout=layout, x_density=x_density, y_density=y_density) for page in file.pages]
 
+
     def extract_gridbased(self,table_settings:dict={},page_nums:list=None) -> list[table_format]:
         """
         extracts table and keeps reference to the page it came from
@@ -51,7 +53,8 @@ class extractor():
                 return [table_format(table=table,page=file.pages[page_num]) for page_num in page_nums for table in file.pages[page_num].find_tables(table_settings=table_settings)] 
             else:
                 return [table_format(table=table,page=page) for page in file.pages for table in page.find_tables(table_settings=table_settings)]
-                         
+
+
     def __call__(self,path:str) -> None:
         """
         update the path (that is used to extract the file)
@@ -72,9 +75,13 @@ class tableAnalyser():
     fuzz.token_set_ratio
 
     """
-    def __init__(self,matching_func:Callable=fuzz.ratio) -> None:
+    def __init__(self,matching_func:Callable=fuzz.ratio,download_spacy:bool=True) -> None:
         self.matching_func = matching_func
-         
+
+        if(download_spacy):
+            spacy.cli.download("nl_core_news_sm")
+
+        self.NER = spacy.load("nl_core_news_sm")
 
     def isInTableElement(self,table_elem:str,targetWord:str,threshold:float) -> bool:
         if(table_elem is None):
@@ -85,9 +92,7 @@ class tableAnalyser():
 
         if(self.matching_func(table_elem,targetWord) >= threshold):
             return True
-
         return False
-
 
     def findInTable(self,table:pd.DataFrame,targetWord:str,threshold:float) -> tuple[np.array,np.array]: #returns (xpos_array,ypos_array)
         """
@@ -101,6 +106,34 @@ class tableAnalyser():
 
         return masked_table.nonzero()
 
+    def entity_replacer(self,text:str) -> tuple[str,str]:
+        """
+        replaces all the words in the text with their found entity type.
+
+        return orignal string, the string with all it's enities replaced by their entity type
+        """
+        ents = self.NER(text).ents  
+
+        mask = np.ones(len(text))
+        labels = []
+        for ent in ents:
+            mask[ent.start_char:ent.end_char] = 0
+            labels.append(ent.label_)
+
+        current_num = 1 
+        current_label_index = 0
+        new_text = ""
+        for text_pos,num in enumerate(mask):
+            if(num < current_num):
+                new_text += labels[current_label_index]
+                current_label_index += 1
+            
+            if(num == 1):
+                new_text += text[text_pos]
+            current_num = num 
+
+        return text,new_text
+
 
     def findtable(self,table_list:list[table_format],targetWord:str,threshold:float) -> list[tuple[int,pd.DataFrame]]:
         """
@@ -109,7 +142,6 @@ class tableAnalyser():
         """
  
         table_list = tableAnalyser.tableListToDataFrameList(table_list)    
-        
 
         for table in table_list:
             self.findInTable(table,targetWord,threshold)
@@ -121,8 +153,7 @@ class tableAnalyser():
         turns a list of table format into a list of dataframes
         """
         return [table.table() for table in table_list]
-
-
+    
     @staticmethod
     def pathIterator(directory_files:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> Generator:
         """
@@ -133,8 +164,14 @@ class tableAnalyser():
             if(file_path.split(".")[-1] in accepted_formats):
                 yield os.path.join(root_path,file_path)
 
-
 if __name__ == "__main__":
+    #param 
+    download_spacy = True 
+
+    #download dependencies
+
+
+    #wnt extraction test
     table_page_numbers = {"wnt_grid.pdf":[39,40],"wnt_grid2.pdf":[35,36]}    
     analyser = tableAnalyser()
 
@@ -144,4 +181,3 @@ if __name__ == "__main__":
             table_list = extractor(path).extract_gridbased(page_nums=table_page_numbers[current_filename])
 
             print(analyser.findtable(table_list,"gegevens",0.6))
-            
