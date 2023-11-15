@@ -3,6 +3,7 @@ from tkinter import filedialog
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import threading
 from LoadingWindow import LoadingWindow
+import os
 
 class PDFProcessorApp:
     def __init__(self, root):
@@ -11,7 +12,7 @@ class PDFProcessorApp:
 
     def init_gui(self):
         self.root.title("PDF Processor")
-        self.root.iconbitmap("src\images\icon.ico")
+        self.root.iconbitmap(os.path.join(os.getcwd(),os.path.join("images","icon.ico")))
         self.root.configure(bg="white")
         self.set_window_geometry(600, 600)
 
@@ -39,7 +40,7 @@ class PDFProcessorApp:
         self.root.geometry(f"{width}x{height}+{x}+{y}")
 
     def create_image_label(self):
-        image = tk.PhotoImage(file="src\images\image333.png")
+        image = tk.PhotoImage(file=os.path.join(os.getcwd(),os.path.join("images","image333.png")))
         self.image_label = tk.Label(self.root, image=image)
         self.image_label.image = image
         self.image_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)

@@ -1,10 +1,11 @@
 import tkinter as tk
 import threading
+import os 
 
 class LoadingWindow(tk.Toplevel):
     def __init__(self, parent, file_name, path, selected_files):
         super().__init__(parent)
-        self.iconbitmap("src\images\icon.ico")
+        self.iconbitmap(os.path.join(os.getcwd(),os.path.join("images","icon.ico"))) #gives path to images/icon.ico (os agnostic)
         self.title("LOADING")
         self.file_name = file_name  # Store the file name
         self.path = path  # Store the path
