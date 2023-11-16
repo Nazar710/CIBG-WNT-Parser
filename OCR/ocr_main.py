@@ -1,42 +1,107 @@
-import subprocess
-import sys
 import os
 import platform
 import ctypes
+import pandas as pd
 import requests
 import subprocess
 from PIL import Image
 import pytesseract
+import matplotlib.pyplot as plt
 
 
 class OCRMain:
-    def __init__(self):
-        pass
+    @staticmethod
+    def extract_coordinate(image_file_name: str, coordinate_tuple: tuple, path: str = '../OCR/testfiles/', psm=6):
+        """
+        Scans specific coordinates within an image and outputs text
+        It also plots the original and cropped image
 
-    def extract_coordinate(self, img, left, top, right, bottom):
-        pass
+        @param image_file_name: file name of the image in the path
+        @param coordinate_tuple:     a tuple of coordinates (left, top, right, bottom)
+        @param path:            path for finding the files
+        @param psm:             changing the configuration settings of Tesseract, see documentation: https://muthu.co/all-tesseract-ocr-options/
+        @return:                pandas dataframe with text and each line break is a new row
+        """
 
-    def extract_image(self, img):
-        pass
+        custom_config = r'--psm ' + str(psm)
+
+        img = Image.open(path + image_file_name)
+        cropped_img = img.crop(coordinate_tuple)
+        text = pytesseract.image_to_string(cropped_img, config=custom_config)
+
+        print(text)
+        plt.imshow(img)
+        plt.title('Original image')
+        plt.show()
+        plt.imshow(cropped_img)
+        plt.title('Cropped image')
+        plt.show()
+
+        # Split the text into lines
+        lines = text.split('\n')
+
+        # Create a DataFrame with each line as a new row
+        df = pd.DataFrame({'Text': lines})
+
+        return df
+
+    @staticmethod
+    def extract_image(image_file_name: str, path: str = '../OCR/testfiles/', psm=6):
+        """
+        scans an image and outputs text
+
+        @param image_file_name: file name of the image in the path
+        @param path:            path for finding the files
+        @param psm:             changing the configuration settings of Tesseract, see documentation: https://muthu.co/all-tesseract-ocr-options/
+        @return:                pandas dataframe with text and each line break is a new row
+        """
+        custom_config = r'--psm ' + str(psm)
+
+        img = Image.open(path + image_file_name)
+        text = pytesseract.image_to_string(img, config=custom_config)
+
+        print(text)
+
+        # Split the text into lines
+        lines = text.split('\n')
+
+        # Create a DataFrame with each line as a new row
+        df = pd.DataFrame({'Text': lines})
+
+        return df
 
 
 class OCRInstall:
-    # code to determine whether user is admin
-    def __is_admin(self):
+    @staticmethod
+    def __is_admin():
+        """
+        code to determine whether user is admin
+        @return:
+        """
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
         except:
             return False
 
-    # code to run installation process of Tesseract as admin
-    def __run_as_admin(self, command, folder=None):
+
+    @staticmethod
+    def __run_as_admin(command, folder=None):
+        """
+        Code to run installation process of Tesseract as admin
+        @return:
+        """
         try:
             subprocess.run(['powershell', 'Start-Process', '-Verb', 'RunAs', '-FilePath', command], check=True)
         except subprocess.CalledProcessError as e:
             print(f"Error running as admin: {e}")
 
-    # installation of Tesseract
-    def __install_tesseract(self):
+    #
+    @staticmethod
+    def __install_tesseract():
+        """
+        Downloads and installs Tesseract
+        @return:
+        """
         system_platform = platform.system().lower()
 
         if system_platform == 'windows':
@@ -51,7 +116,7 @@ class OCRInstall:
                     installer_file.write(response.content)
 
                 # Run the installer with elevated privileges
-                self.run_as_admin(installer_path)
+                OCRInstall.__run_as_admin(installer_path)
 
                 # Remove the downloaded installer
                 os.remove(installer_path)
@@ -61,17 +126,38 @@ class OCRInstall:
         else:
             print(f"Unsupported platform: {system_platform}")
 
-    def run(self):
+    @staticmethod
+    def install():
+        """
+        This method downloads and installs the pytesseract engine and package depending on the OS you have
+        It also ensures admin rights for installation purposes
+
+        @return:
+        """
         # Run the script with elevated privileges
-        if self.is_admin():
-            self.install_tesseract()
+        if OCRInstall.__is_admin():
+            OCRInstall.__install_tesseract()
         else:
             # Re-run only the Tesseract installation with elevated privileges
             tesseract_install_command = os.path.join(os.getcwd(), 'tesseract_installer.exe')
-            self.run_as_admin(tesseract_install_command)
+            OCRInstall.__run_as_admin(tesseract_install_command)
 
         # Install required packages
         subprocess.run(['pip', 'install', 'pytesseract', 'Pillow'])
 
-        # set path to the tesseract executable, CHANGE THIS IF YOU SAVED IT SOMEWHERE ELSE
-        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+        OCRInstall.set_path()
+
+    @staticmethod
+    def set_path(path: str = r'C:\Program Files\Tesseract-OCR\tesseract.exe'):
+        """
+        sets path to the tesseract executable, CHANGE THIS IF YOU SAVED IT SOMEWHERE ELSE
+        @param path: path to the Tesseract executable
+        @return:
+        """
+        pytesseract.pytesseract.tesseract_cmd = path
+
+#OCRInstall.install()
+OCRInstall.set_path()
+coordinates = (0, 0, 120, 120)
+ocr = OCRMain.extract_coordinate(image_file_name='2_clean_top.png', coordinate_tuple=coordinates, psm=6)
+print(ocr)
