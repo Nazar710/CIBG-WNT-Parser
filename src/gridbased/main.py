@@ -112,18 +112,24 @@ class tableAnalyser():
             return True
         return False
 
-    def findInTable(self,table:pd.DataFrame,targetWord:str,threshold:float) -> tuple[np.array,np.array]: #returns (xpos_array,ypos_array)
+    def findInTable(self,table:pd.DataFrame,targetWord:str,threshold:float,acceptable_x:list=None,acceptable_y:list=None) -> list[np.array]: #returns [pos ,pos pos] with pos being np.array([x,y])
         """
         Use fuzzy matching to see how similar the words are.
-        fuzzy matching has a value in range [0,1].
+        
+        fuzzy matching has a value in range [0,100].
         it's more than the threshold we will accept that there is word at that position.
 
-        returns (xpos_Array,ypos_Array) for each element in the table that is in the right format
+        acceptable_x and acceptable_y are used to define what row and column are accepted.
+
+        returns [np.array[x,y],np.array[x,y]] for each element in the table that is in the right format
         """
 
         masked_table = table.map(partial(self.isInTableElement,threshold=threshold,targetWord=targetWord)).to_numpy()
+        x,y = masked_table.nonzero()
+        positions = np.concatenate((np.expand_dims(x,axis=1),np.expand_dims(y,axis=1)),axis=1)
+        
+        return [pos for pos in positions if (acceptable_x is None or pos[0] in acceptable_x) and  (acceptable_y is None or pos[1] in acceptable_y)]
 
-        return masked_table.nonzero()
 
     def entity_replacer(self,text:str) -> tuple[str,str]:
         """
@@ -154,7 +160,7 @@ class tableAnalyser():
         return text,new_text
 
 
-    def findtable(self,table_list:list[table_format],targetWord:str,threshold:float) -> list[tuple[int,pd.DataFrame]]:
+    def findtable(self,table_list:list[table_format],threshold:float) -> list[tuple[int,pd.DataFrame]]:
         """
         TODO find the wnt tables.
         return a list of wnt tables coupled to their year if available
@@ -162,9 +168,17 @@ class tableAnalyser():
  
         table_list = tableAnalyser.tableListToDataFrameList(table_list)    
 
+
         for table in table_list:
-            self.findInTable(table,targetWord,threshold)
-            
+
+
+            print(self.findInTable(table,"bezoldiging",threshold,acceptable_x=[0,1],acceptable_y=[0,1]))
+
+    def extractWntTable(wnt:pd.DataFrame):
+        """
+        TODO get the information out of the found wnt table into a nice standardized representation 
+        """
+        pass        
 
     @staticmethod
     def tableListToDataFrameList(table_list:list[table_format]) -> list[pd.DataFrame]:
@@ -183,9 +197,21 @@ class tableAnalyser():
             if(file_path.split(".")[-1] in accepted_formats):
                 yield os.path.join(root_path,file_path)
 
+
+"""
+first find what is a wnt table and if possible give it's corresponding year:
+    -
+    -
+    -
+after this extract the wnt table.
+
+"""
+
+
+
 if __name__ == "__main__":
     #param 
-    download_spacy = True 
+    download_spacy = False 
 
     #wnt extraction test
     table_page_numbers = {"wnt_grid.pdf":[39,40],"wnt_grid2.pdf":[35,36]}    
@@ -196,4 +222,4 @@ if __name__ == "__main__":
         if(current_filename in table_page_numbers.keys()):
             table_list = extractor(path).extract_gridbased(page_nums=table_page_numbers[current_filename])
 
-            print(analyser.findtable(table_list,"gegevens 2020",0.6))
+            print(analyser.findtable(table_list,0))
