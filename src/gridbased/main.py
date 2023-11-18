@@ -211,14 +211,14 @@ after this extract the wnt table.
 
 if __name__ == "__main__":
     #param 
-    download_spacy = False 
+    download_spacy = False
 
     #wnt extraction test
     table_page_numbers = {"wnt_grid.pdf":[39,40],"wnt_grid2.pdf":[35,36]}    
     analyser = tableAnalyser(download_spacy=download_spacy)
 
     for path in analyser.pathIterator():
-        current_filename =path.split("/")[-1]
+        current_filename = os.path.basename(path)
         if(current_filename in table_page_numbers.keys()):
             table_list = extractor(path).extract_gridbased(page_nums=table_page_numbers[current_filename])
 
