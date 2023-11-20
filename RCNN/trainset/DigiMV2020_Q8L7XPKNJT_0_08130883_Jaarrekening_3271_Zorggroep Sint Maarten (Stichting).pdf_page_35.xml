@@ -1,0 +1,50 @@
+<annotation>
+	<folder>data</folder>
+	<filename>DigiMV2020_Q8L7XPKNJT_0_08130883_Jaarrekening_3271_Zorggroep Sint Maarten (Stichting).pdf_page_35.png</filename>
+	<path>D:\CODING\CIBG-WNT-Parser\src\pdfs\white space tables\data\DigiMV2020_Q8L7XPKNJT_0_08130883_Jaarrekening_3271_Zorggroep Sint Maarten (Stichting).pdf_page_35.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2481</width>
+		<height>3508</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1394</xmin>
+			<ymin>761</ymin>
+			<xmax>1713</xmax>
+			<ymax>1587</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1709</xmin>
+			<ymin>769</ymin>
+			<xmax>1939</xmax>
+			<ymax>1602</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>216</xmin>
+			<ymin>713</ymin>
+			<xmax>1120</xmax>
+			<ymax>1598</ymax>
+		</bndbox>
+	</object>
+</annotation>

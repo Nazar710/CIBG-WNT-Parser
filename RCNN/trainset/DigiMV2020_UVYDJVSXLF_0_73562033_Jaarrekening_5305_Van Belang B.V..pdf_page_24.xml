@@ -1,0 +1,50 @@
+<annotation>
+	<folder>data</folder>
+	<filename>DigiMV2020_UVYDJVSXLF_0_73562033_Jaarrekening_5305_Van Belang B.V..pdf_page_24.png</filename>
+	<path>D:\CODING\CIBG-WNT-Parser\src\pdfs\white space tables\data\DigiMV2020_UVYDJVSXLF_0_73562033_Jaarrekening_5305_Van Belang B.V..pdf_page_24.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2481</width>
+		<height>3508</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>942</xmin>
+			<ymin>998</ymin>
+			<xmax>1264</xmax>
+			<ymax>2517</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>213</xmin>
+			<ymin>954</ymin>
+			<xmax>924</xmax>
+			<ymax>2550</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1283</xmin>
+			<ymin>991</ymin>
+			<xmax>1542</xmax>
+			<ymax>2528</ymax>
+		</bndbox>
+	</object>
+</annotation>

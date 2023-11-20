@@ -1,0 +1,38 @@
+<annotation>
+	<folder>white space tables</folder>
+	<filename>DigiMV2020_LV7KMBXSWB_0_09212724_Jaarrekening_5697_GGD Gelderland-Zuid (Veilig Thuis).pdf_page_40.png</filename>
+	<path>D:\CODING\CIBG-WNT-Parser\src\pdfs\white space tables\DigiMV2020_LV7KMBXSWB_0_09212724_Jaarrekening_5697_GGD Gelderland-Zuid (Veilig Thuis).pdf_page_40.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2481</width>
+		<height>3508</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1538</xmin>
+			<ymin>761</ymin>
+			<xmax>1875</xmax>
+			<ymax>2691</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>298</xmin>
+			<ymin>724</ymin>
+			<xmax>1390</xmax>
+			<ymax>2694</ymax>
+		</bndbox>
+	</object>
+</annotation>

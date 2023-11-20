@@ -1,0 +1,62 @@
+<annotation>
+	<folder>white space tables</folder>
+	<filename>DigiMV2020_3GU8R9N4R7_0_41022558_Jaarrekening_9807_Rosengaerde (Stichting).pdf_page_24.png</filename>
+	<path>D:\CODING\CIBG-WNT-Parser\src\pdfs\white space tables\DigiMV2020_3GU8R9N4R7_0_41022558_Jaarrekening_9807_Rosengaerde (Stichting).pdf_page_24.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2481</width>
+		<height>3508</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1198</xmin>
+			<ymin>631</ymin>
+			<xmax>1512</xmax>
+			<ymax>1880</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1594</xmin>
+			<ymin>628</ymin>
+			<xmax>1883</xmax>
+			<ymax>1883</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1968</xmin>
+			<ymin>628</ymin>
+			<xmax>2238</xmax>
+			<ymax>1869</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>242</xmin>
+			<ymin>587</ymin>
+			<xmax>953</xmax>
+			<ymax>1876</ymax>
+		</bndbox>
+	</object>
+</annotation>

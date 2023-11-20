@@ -1,0 +1,38 @@
+<annotation>
+	<folder>data</folder>
+	<filename>DigiMV2020_Q8C44KYNSB_0_41020715_Jaarrekening_4114_Zorgcollectief Zuidwest-Drenthe (Stichting).pdf_page_23.png</filename>
+	<path>D:\CODING\CIBG-WNT-Parser\src\pdfs\white space tables\data\DigiMV2020_Q8C44KYNSB_0_41020715_Jaarrekening_4114_Zorgcollectief Zuidwest-Drenthe (Stichting).pdf_page_23.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2481</width>
+		<height>3508</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1325</xmin>
+			<ymin>500</ymin>
+			<xmax>1610</xmax>
+			<ymax>1251</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>228</xmin>
+			<ymin>524</ymin>
+			<xmax>976</xmax>
+			<ymax>1263</ymax>
+		</bndbox>
+	</object>
+</annotation>

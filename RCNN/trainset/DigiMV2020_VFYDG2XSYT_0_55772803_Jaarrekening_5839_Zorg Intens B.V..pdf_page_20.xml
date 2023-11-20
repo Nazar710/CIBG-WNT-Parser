@@ -1,0 +1,38 @@
+<annotation>
+	<folder>data</folder>
+	<filename>DigiMV2020_VFYDG2XSYT_0_55772803_Jaarrekening_5839_Zorg Intens B.V..pdf_page_20.png</filename>
+	<path>D:\CODING\CIBG-WNT-Parser\src\pdfs\white space tables\data\DigiMV2020_VFYDG2XSYT_0_55772803_Jaarrekening_5839_Zorg Intens B.V..pdf_page_20.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2480</width>
+		<height>3508</height>
+		<depth>1</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>263</xmin>
+			<ymin>717</ymin>
+			<xmax>1060</xmax>
+			<ymax>2294</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>coulmn</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1249</xmin>
+			<ymin>709</ymin>
+			<xmax>1586</xmax>
+			<ymax>2276</ymax>
+		</bndbox>
+	</object>
+</annotation>
