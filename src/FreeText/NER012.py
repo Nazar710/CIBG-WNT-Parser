@@ -45,7 +45,9 @@ class free_text():
     def find_sentences_with_keywords_and_entities(self,text:str, keywords:list[str],use_entities:bool=True)->list[str]:
 
         # Convert text and keywords to lowercase for case-insensitive comparison
-        keywords_lower = [keyword.lower() for keyword in keywords]
+        keywords_lower = [keyword.lower() for keyword in keywords] #TODO lowering here will break name/person detection as it heavilly relies on capitalization
+        #TODO fix the bug that lowering breaks the person names. (first finding person names than replacing it with NER, then lower and try to detect the rest)
+        #as sometimes not lowering will break it (for dates).
 
         if(use_entities):
             text = self.entity_replacer(text)
