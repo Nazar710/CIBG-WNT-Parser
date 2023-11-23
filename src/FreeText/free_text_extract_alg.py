@@ -1,10 +1,25 @@
 def extract(text:str, default_year:int):
-
+    """ 
+    this method applies an algorithm that parses through the input text and creates triples of
+    data points that contain the extracted information.
+    
+    TODO: implement a check that removes the last few data points and throws an error
+    if the amount of bezoldigingen found did not match the amount of names found.
+    
+    Args:
+        text: the text for the method to search
+        default_year: the inferred year that the document should default to
+    
+    Returns:
+        A list of triples that each contain a datapoint.
+    
+    """
     character = 0 # the character where our search is at. start at 0
     current_year = default_year # the year we currently have recorded
     names_list = [] # the names we have found so far
     current_name = None
     data_left = True
+    datapoints_list = []
     
     while(character<len(text) and data_left):
         
@@ -18,6 +33,9 @@ def extract(text:str, default_year:int):
         if next_year[0]: next_datapoints.append(next_year)
         if next_names[0]: next_datapoints.append(next_names)
         if next_bezoldiging[0]: next_datapoints.append(next_bezoldiging)
+        else: 
+            data_left = False #if there is no bezoldiging left in the text, exit the loop
+            continue
         
         #find the first datapoint could be found, the one with the lowest value for its character
         next = min(next_datapoints, key = lambda t: t[2])
@@ -43,11 +61,12 @@ def extract(text:str, default_year:int):
                     # if you have encountered a name before, create a data point with the bezoldiging, the name 
                     # and the current year.
                     datapoint = (current_year,names_list[current_name],next[1])
-                    
+                    datapoints_list.append(datapoint)
                     #if your method found multiple names, move to the next
                     if current_name < len(names_list)-1:
                         current_name = current_name+1
-                    
+        character = next[2] # let the next iteration of the loop start where the last datapoint ended.
+    return datapoints_list
                         
                         
                         
@@ -66,13 +85,17 @@ def find_year(text:str, start_character:int)->(bool,int,int,int):
     Returns:
         A tuple containing two things:
         - in its first position, a boolean that is true if the method found a year and false if it did not
-        - in its second position, the year it found
-        - in its third position, the location of the last character of the year in the string
+        - in its second position, the year it found. If nothing got found, None
+        - in its third position, the location of the last character of the year in the string. If nothing got found, None
         - in its fourth position, the label for the type of data this tuple contains. In this case 1
     
     """
     #TODO: implement this method
-    return (True, 0, start_character+1)
+    if(start_character < 1):
+        return (True, 2020, 1,1)
+    if(start_character<5) :
+        return (True, 2019, 5,1)
+    else: return (False, None, None,1)
 
 def find_names(text:str, start_character:int)->(bool,list[str],int,int): 
     """ 
@@ -87,13 +110,17 @@ def find_names(text:str, start_character:int)->(bool,list[str],int,int):
     Returns:
         A tuple containing three things:
         - in its first position, a boolean that is true if the method found a name and false if it did not
-        - in its second position, a list that contains the names 
-        - in its third position,the location of the last character of the last name in the string
+        - in its second position, a list that contains the names. If nothing got found, None
+        - in its third position,the location of the last character of the last name in the string. If nothing got found, None
         - in its fourth position, the label for the type of data this tuple contains. In this case 2
     
     """
     #TODO: implement this method
-    return (True, [""], start_character+2)
+    if(start_character < 2):
+        return (True, ["Mathias"], 2,2)
+    if(start_character < 4):
+        return (True, ["Mattie"], 4,2)
+    else: return (False, None, None,2)
 
 def find_bezoldiging(text:str, start_character:int)->(bool,str,int,int): 
     """ 
@@ -107,16 +134,18 @@ def find_bezoldiging(text:str, start_character:int)->(bool,str,int,int):
     Returns:
         A tuple containing three things:
         - in its first position, a boolean that is true if the method found a name and false if it did not
-        - in its second position, the value of the bezoldiging
-        - in its third position, the location of the last character of this string
+        - in its second position, the value of the bezoldiging. If nothing got found, None
+        - in its third position, the location of the last character of this string. If nothing got found, None
         - in its fourth position, the label for the type of data this tuple contains. In this case 3
     """
     #TODO: implement this method
-    return (True, [""], start_character+3)
+    if(start_character < 3):
+        return (True, ["15 an hour"], 3,3)
+    if(start_character < 6):
+        return (True, ["money"], 6,3)
+    else:
+        return (False, None, None,3)
 
 if __name__ == "__main__":
-    lala = []
-    lala.append(1)
-    lala.append(2)
-    lala.append(3)
-    while(i<len(lala))
+    list = extract("123456789123456789",2020)
+    print(list)
