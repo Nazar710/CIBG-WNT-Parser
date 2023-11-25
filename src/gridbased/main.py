@@ -130,20 +130,40 @@ class tableAnalyser():
         
         return [pos for pos in positions if (acceptable_x is None or pos[0] in acceptable_x) and  (acceptable_y is None or pos[1] in acceptable_y)]
 
-
     def entity_replacer(self,text:str) -> tuple[str,str]:
         """
         replaces all the words in the text with their found entity type.
 
         return orignal string, the string with all it's enities replaced by their entity type
+
+        lower to reduce the risk of miss binding of entities.
+          
+                gegevens 2020 -> gegevens [date].  
+                Gegevens 2020 -> [data]
+        but person names will not work be seen as persons when you lower the capitalization of the letters.
+        so first without lowering extract the [persons] locations, afterwards rerun with lower and extract the other named entity locations
+        Then replace the named entities with [NAMED ENTITY TYPE]
         """
+
+
         ents = self.NER(text).ents  
 
         mask = np.ones(len(text))
         labels = []
+
+        #detect persons 
+        for ent in ents:
+            if(ent.label_ == "PERSON"):
+                mask[ent.start_char:ent.end_char] = 0
+                labels.append((ent.start_char,ent.label_))
+        
+        text = text.lower()
+        #detect the rest
         for ent in ents:
             mask[ent.start_char:ent.end_char] = 0
-            labels.append(ent.label_)
+            labels.append((ent.start_char,ent.label_))          
+
+        labels = [elem[1] for elem in sorted(labels,key=lambda elem: elem[0])] 
 
         current_num = 1 
         current_label_index = 0
@@ -157,6 +177,7 @@ class tableAnalyser():
                 new_text += text[text_pos]
             current_num = num 
 
+        #print(new_text)
         return text,new_text
 
 
