@@ -106,7 +106,6 @@ class tableAnalyser():
             #TODO since there is a distinction made between CARDINALITY and MONEY labels (and similar instances) it might be necisary to find groups of entities labels and map them to the same thing
 
             table_elem = self.entity_replacer(table_elem)[1]
-            targetWord = self.entity_replacer(targetWord)[1]
 
         if(self.matching_func(table_elem,targetWord) >= threshold):
             return True
@@ -156,7 +155,7 @@ class tableAnalyser():
             if(ent.label_ == "PERSON"):
                 mask[ent.start_char:ent.end_char] = 0
                 labels.append((ent.start_char,ent.label_))
-        
+    
         text = text.lower()
         #detect the rest
         for ent in ents:
@@ -177,29 +176,31 @@ class tableAnalyser():
                 new_text += text[text_pos]
             current_num = num 
 
-        #print(new_text)
         return text,new_text
 
 
-    def findtable(self,table_list:list[table_format],threshold:float) -> list[tuple[int,pd.DataFrame]]:
+    def findtable(self,table_list:list[pd.DataFrame]) -> list[pd.DataFrame]:
         """
         TODO find the wnt tables.
         return a list of wnt tables coupled to their year if available
         """
  
-        table_list = tableAnalyser.tableListToDataFrameList(table_list)    
+        for table in table_list:
+            pass 
+        
 
+    def extract_wnt_table(self,table_list:list[pd.DataFrame]):
 
         for table in table_list:
+            #find functie gegevens  
+            
+            position_list = self.findInTable(table,"PERSON",70)
+            
+            # position_list = self.findInTable(table,"functiegegevens",70,acceptable_y=[0])
+            print(position_list)
+            print(table)
 
 
-            print(self.findInTable(table,"bezoldiging",threshold,acceptable_x=[0,1],acceptable_y=[0,1]))
-
-    def extractWntTable(wnt:pd.DataFrame):
-        """
-        TODO get the information out of the found wnt table into a nice standardized representation 
-        """
-        pass        
 
     @staticmethod
     def tableListToDataFrameList(table_list:list[table_format]) -> list[pd.DataFrame]:
@@ -242,5 +243,4 @@ if __name__ == "__main__":
         current_filename = os.path.basename(path)
         if(current_filename in table_page_numbers.keys()):
             table_list = extractor(path).extract_gridbased(page_nums=table_page_numbers[current_filename])
-
-            print(analyser.findtable(table_list,0))
+            print(analyser.extract_wnt_table(tableAnalyser.tableListToDataFrameList(table_list)))
