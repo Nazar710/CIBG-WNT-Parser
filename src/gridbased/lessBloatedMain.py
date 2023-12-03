@@ -238,12 +238,12 @@ class table_analyser():
             
 
 
-    def extractWNTInfo(self,wnt_tables:list[pd.DataFrame],page_num:list[int]) -> pd.DataFrame:
+    def extractWNTInfo(self,wnt_tables:list[pd.DataFrame],page_num:list[int],file_name:str) -> pd.DataFrame:
         """
         extract the (year,person_name,totale bezoldiging,page) for each person in the wnt table
         return a table with this
         """
-        final_dataframe = pd.DataFrame({"name":[],"bezoldiging":[],"year":[],"page":[]})
+        final_dataframe = pd.DataFrame({"name":[],"bezoldiging":[],"year":[],"page":[],"file":[]})
         
         for table,page_num in zip(wnt_tables,page_num):
             #find table year and the position 
@@ -282,13 +282,12 @@ class table_analyser():
                     #since it only gives the row not the elements first extract the elements
                     bezoldiging_values_with_person = self.bezoldiging_value_extraction(table,pos,person_positions)
                     #add year to tuple 
-                    final_tuples = [pd.DataFrame({"name":[name],"bezoldiging":[bezoldiging],"year":[str(current_year)],"page":[str(page_num)]}) for name,bezoldiging in bezoldiging_values_with_person]
+                    final_tuples = [pd.DataFrame({"name":[name],"bezoldiging":[bezoldiging],"year":[str(current_year)],"page":[str(page_num)],"file":[file_name]}) for name,bezoldiging in bezoldiging_values_with_person]
 
                     #store tuples in table
 
                     for df in final_tuples:
                         final_dataframe = pd.concat((final_dataframe,df),ignore_index=True)
-                        
 
                     #reset year
                     current_year = None 
@@ -306,6 +305,9 @@ if __name__ == "__main__":
     table_extractor = extractor() 
     analyser = table_analyser()
     
+    for path in table_extractor.filePathIterator():
+        print(path)
+
     tables,pages= table_extractor.extract_table("./example_pdfs/wnt_grid.pdf",[39])
     
-    analyser.extractWNTInfo(tables,pages)
+    analyser.extractWNTInfo(tables,pages,"wnt_grid.pdf")
