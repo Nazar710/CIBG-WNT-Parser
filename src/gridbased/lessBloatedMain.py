@@ -282,7 +282,7 @@ class table_analyser():
                     #since it only gives the row not the elements first extract the elements
                     bezoldiging_values_with_person = self.bezoldiging_value_extraction(table,pos,person_positions)
                     #add year to tuple 
-                    final_tuples = [pd.DataFrame({"name":[name],"bezoldiging":[bezoldiging],"year":[current_year],"page":[page_num]}) for name,bezoldiging in bezoldiging_values_with_person]
+                    final_tuples = [pd.DataFrame({"name":[name],"bezoldiging":[bezoldiging],"year":[str(current_year)],"page":[str(page_num)]}) for name,bezoldiging in bezoldiging_values_with_person]
 
                     #store tuples in table
 
