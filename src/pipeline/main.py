@@ -1,12 +1,13 @@
 import pandas as pd 
 from typing import Any
 from gridbased import table_extractor,table_analyser
-
+from candidates import CandidatePages
 
 class WNT_analyser():
     def __init__(self,download_spacy:bool,gridtable_settings:dict={}) -> None:
         self.table_analyser = table_analyser(download_spacy)
         self.table_extractor = table_extractor(table_settings=gridtable_settings)
+        self.candidate_pages = CandidatePages()
 
     def __call__(self, folder_name:str,**kwargs) -> pd.DataFrame:
         """
