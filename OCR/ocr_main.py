@@ -4,14 +4,83 @@ import ctypes
 import pandas as pd
 import requests
 import subprocess
-from PIL import Image
 import pytesseract
 import matplotlib.pyplot as plt
-
+from PIL import Image
+from pdf2image import convert_from_path
+import shutil
 
 class OCRMain:
     @staticmethod
-    def extract_coordinate(image_file_name: str, coordinate_tuple: tuple, path: str = '../OCR/testfiles/', psm=6):
+    def on_file(input_file: str, temp_output_folder: str = '../OCR/tmppages/'):
+        """
+        Args:
+            input_file: path of the pdf file
+            temp_output_folder: place where temporarily images are stored of every page of the pdf file
+        Returns: array with text objects where every index refers to a text object of a single page
+
+        """
+        OCRMain.__convert_pdf_to_img(input_file, temp_output_folder)
+        text_objects = OCRMain.__extract_text_from_images(temp_output_folder)
+
+        return [str(text_obj) for text_obj in text_objects]
+
+    @staticmethod
+    def __extract_text_from_images(input_folder: str = '../OCR/tmppages/'):
+        '''
+        Args:
+            input_folder:   path to the folder where images are located
+        Returns:            array with text objects where every index refers to a text object of a single page
+        '''
+        OCRInstall.set_path()
+
+        output_text = []
+
+        # Get a list of all image files in the input folder
+        image_files = [f for f in os.listdir(input_folder) if
+                       f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
+
+        for image_file in image_files:
+            # Construct full path for the image
+            image_path = os.path.join(input_folder, image_file)
+
+            # Open the image
+            with Image.open(image_path) as img:
+                # Perform OCR on the image
+                custom_config = r'--psm 6'  # Adjust the configuration as needed
+                text = pytesseract.image_to_string(img, config=custom_config)
+
+                # Append the extracted text to the output array
+                output_text.append(text)
+
+        shutil.rmtree(input_folder)
+
+        return output_text
+
+    @staticmethod
+    def __convert_pdf_to_img(input_file: str, output_folder: str ='../OCR/tmppages/'):
+        """
+        Args:
+            input_file: path to the pdf file
+            output_folder: path to the output folder
+        Returns:
+        """
+
+
+        # Store Pdf with convert_from_path function
+        images = convert_from_path(input_file,poppler_path = r"C:\Program Files\Poppler\poppler-23.11.0\Library\bin")
+
+        # If folder doesn't exist, create it
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+
+        for i in range(len(images)):
+            # Save pages as images to folder tmppages
+            images[i].save(output_folder + os.path.splitext(os.path.basename(input_file))[0] + '-' + str(i) + '.jpg', 'JPEG')
+
+
+    @staticmethod
+    def extract_coordinate(image_file_name: str, coordinate_tuple: tuple, path: str = '../OCR/testfiles/', psm:int=6):
         """
         Scans specific coordinates within an image and outputs text
         It also plots the original and cropped image
@@ -46,29 +115,18 @@ class OCRMain:
         return df
 
     @staticmethod
-    def extract_image(image_file_name: str, path: str = '../OCR/testfiles/', psm=6):
+    def extract_image(path: str, psm: int =6):
         """
         scans an image and outputs text
-
-        @param image_file_name: file name of the image in the path
         @param path:            path for finding the files
         @param psm:             changing the configuration settings of Tesseract, see documentation: https://muthu.co/all-tesseract-ocr-options/
         @return:                pandas dataframe with text and each line break is a new row
         """
         custom_config = r'--psm ' + str(psm)
 
-        img = Image.open(path + image_file_name)
+        img = Image.open(path)
         text = pytesseract.image_to_string(img, config=custom_config)
-
-        print(text)
-
-        # Split the text into lines
-        lines = text.split('\n')
-
-        # Create a DataFrame with each line as a new row
-        df = pd.DataFrame({'Text': lines})
-
-        return df
+        return text
 
 
 class OCRInstall:
@@ -156,8 +214,11 @@ class OCRInstall:
         """
         pytesseract.pytesseract.tesseract_cmd = path
 
-#OCRInstall.install()
-OCRInstall.set_path()
-coordinates = (0, 0, 120, 120)
-ocr = OCRMain.extract_coordinate(image_file_name='2_clean_top.png', coordinate_tuple=coordinates, psm=6)
-print(ocr)
+if __name__ == "__main__":
+    ocr = OCRMain.on_file("C:/Users/noahc/Downloads/labeling/DigiMV2020_J6RF69VN57_0_09179857_Accountantsverklaring_5427_I Care B.V..pdf")
+    print(ocr[0])
+
+
+
+
+
