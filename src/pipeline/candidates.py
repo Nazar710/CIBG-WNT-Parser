@@ -69,5 +69,5 @@ class CandidatePages:
         return candidates        
             
 if __name__ == "__main__":
-    getcandidates = CandidatePages(ocr=None)
-    print(getcandidates.get_candidates())
+    getcandidates = CandidatePages()
+    print(getcandidates.get_candidates(r"C:\Users\noahc\PycharmProjects\CIBG-WNT-Parser\dataProcessing\Type2-scan.pdf"))

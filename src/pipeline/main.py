@@ -79,7 +79,7 @@ step 2 notes:
 
 if __name__ == "__main__":
     #general settings 
-    download_spacy = False 
+    download_spacy = True
     folder_name = ""
     #method
     WNT_analysor = WNT_analyser(download_spacy) 

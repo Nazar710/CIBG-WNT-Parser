@@ -18,7 +18,6 @@ class OCRMain:
             input_file: path of the pdf file
             temp_output_folder: place where temporarily images are stored of every page of the pdf file
         Returns: array with text objects where every index refers to a text object of a single page
-
         """
         OCRMain.__convert_pdf_to_img(input_file, temp_output_folder)
         text_objects = OCRMain.__extract_text_from_images(temp_output_folder)
@@ -53,7 +52,7 @@ class OCRMain:
                 # Append the extracted text to the output array
                 output_text.append(text)
 
-        shutil.rmtree(input_folder)
+        #shutil.rmtree(input_folder)
 
         return output_text
 
