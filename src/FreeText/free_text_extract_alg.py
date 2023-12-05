@@ -1,5 +1,7 @@
 import pandas as pd
 import datetime
+import re
+import spacy
 class extract_free_text:
     @staticmethod
     def extract(text:str,page:int,file:str,default_year:int = None):
@@ -25,8 +27,8 @@ class extract_free_text:
         names_list = [] # the names we have found so far
         current_name = None
         data_left = True
-        confirmed_data = []
-        
+        confirmed_data = [] # data that did not contradict anything
+        potential_data = [] # a temporary list that contains the datalist before they are checked
         while(character<len(text) and data_left):
             
             # try to find the next instances of a year, names and bezoldiging
@@ -41,6 +43,10 @@ class extract_free_text:
             if next_bezoldiging[0]: next_datapoints.append(next_bezoldiging)
             else: 
                 data_left = False #if there is no bezoldiging left in the text, exit the loop
+                
+                #add the potential data points to the confirmed datapoint if it matches up with the number of names
+                if (len(potential_data)%len(names_list)==0):
+                        confirmed_data.append(potential_data)
                 continue
             
             #find the first datapoint could be found, the one with the lowest value for its character
@@ -56,7 +62,10 @@ class extract_free_text:
                     
                 # the next datapoint is a name or names
                 case 2:
-                    potential_data = [] # a temporary list that contains the data points.
+                #add the potential data points to the confirmed datapoint if it matches up with the number of names
+                    if (len(names_list)!= 0) and (len(potential_data)%len(names_list)==0):
+                        confirmed_data.append(potential_data)
+                        
                     names_list = next[1]
                     current_name = 0
                     # you encountered a name, reset to the default year
@@ -68,7 +77,7 @@ class extract_free_text:
                         # if you have encountered a name before, create a data point with the bezoldiging, the name 
                         # and the current year.
                         datapoint = (str(names_list[current_name]),str(next[1]),str(current_year),str(page),str(file))
-                        confirmed_data.append(datapoint)
+                        potential_data.append(datapoint)
                         #if your method found multiple names, move to the next
                         if current_name < len(names_list)-1:
                             current_name = current_name+1
@@ -88,7 +97,7 @@ class extract_free_text:
             start_character: the character from which the search should start
         
         Returns:
-            A tuple containing two things:
+            A tuple containing four things:
             - in its first position, a boolean that is true if the method found a year and false if it did not
             - in its second position, the year it found. If nothing got found, None
             - in its third position, the location of the last character of the year in the string. If nothing got found, None
@@ -113,7 +122,7 @@ class extract_free_text:
             start_character: the character from which the search should start
         
         Returns:
-            A tuple containing three things:
+            A tuple containing four things:
             - in its first position, a boolean that is true if the method found a name and false if it did not
             - in its second position, a list that contains the names. If nothing got found, None
             - in its third position,the location of the last character of the last name in the string. If nothing got found, None
@@ -121,11 +130,13 @@ class extract_free_text:
         
         """
         #TODO: implement this method
-        if(start_character < 2):
-            return (True, ["Mathias"], 2,2)
-        if(start_character < 4):
-            return (True, ["Mattie"], 4,2)
-        else: return (False, None, None,2)
+        free_text_obj = FreeText(download_spacy=False)
+        name,_,end = free_text_obj.find_named_entity_from_index(text,start_character)
+        if(end == -1):
+            return (False,None,None,2)
+        else:
+            return(True,name,end,2)
+        
     @staticmethod
     def find_bezoldiging(text:str, start_character:int)->(bool,str,int,int): 
         """ 
@@ -137,7 +148,7 @@ class extract_free_text:
             start_character: the character from which the search should start
         
         Returns:
-            A tuple containing three things:
+            A tuple containing four things:
             - in its first position, a boolean that is true if the method found a name and false if it did not
             - in its second position, the value of the bezoldiging. If nothing got found, None
             - in its third position, the location of the last character of this string. If nothing got found, None
@@ -151,6 +162,68 @@ class extract_free_text:
         else:
             return (False, None, None,3)
 
+#zijian's code
+# if you didn't download spacy plz turn bool = True ⬇
+class FreeText:
+    def __init__(self, download_spacy: bool = False, nlp_core_path: str = "nl_core_news_sm") -> None:
+        if download_spacy:
+            spacy.cli.download(nlp_core_path)
+        self.NER = spacy.load(nlp_core_path)
+
+    def find_named_entity_from_index(self, text: str, start_index: int) -> tuple:
+        """
+        Find the first named entity in the text starting from the given index.
+        :param text: The input text.
+        :param start_index: The index to start searching for named entities.
+        :return: A tuple containing the named entity, its starting index, and its ending index.
+                 If no named entity is found, returns an empty string and -1 for both indices.
+        """
+        # Define a pattern for uppercase_dot with 1-4 repetitions
+        pattern = re.compile(r'([A-Z]\.){1,4}')
+        # Find all matches in the given text
+        matches = pattern.findall(text[start_index:])
+        ents = self.NER(text[start_index:]).ents
+
+        # Convert matches to a common format
+        matches_entities = [(match, start_index + text[start_index:].find(match),
+                             start_index + text[start_index:].find(match) + len(match)) for match in matches]
+
+        # Convert spaCy entities to a common format
+        spacy_entities = [(entity.text, start_index + entity.start_char, start_index + entity.end_char)
+                          for entity in ents if entity.label_ == 'PERSON']
+
+        # Combine both sets of entities
+        all_entities = matches_entities + spacy_entities
+        all_entities = sorted(all_entities, key=lambda x: x[1])
+
+        count = 0;
+        entity_start_index = -1
+        entity_end_index = -1
+        text = ""
+        for entity in all_entities:
+            count += 1
+            if count == 1:
+                entity_start_index = entity[1]
+                entity_end_index = entity[2]
+                text = entity[0]
+            if count == 2:
+                interval = text[entity_end_index:entity[1]]
+                if any(char.isalpha() for char in interval):
+                    print("The 2 names:", text, entity[0], " are connected")
+
+        return text, entity_start_index, entity_end_index
+
 if __name__ == "__main__":
-    list = extract_free_text.extract("123456789123456789",2020,12,"je_moeder.txt")
-    print(list)
+    # Example usage
+    test_text = """P.A. Robin R.J. Mathias en Jade gaan uit eten
+    01/01 - 31/12 """
+
+
+    start_index = 0
+    free_text_obj = FreeText(download_spacy=False)
+    named_entity, entity_start_index, entity_end_index = free_text_obj.find_named_entity_from_index(test_text,
+                                                                                                    start_index)
+    print(named_entity, entity_start_index, entity_end_index)
+
+
+
