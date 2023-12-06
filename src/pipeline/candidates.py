@@ -19,12 +19,8 @@ class CandidatePages:
     
     # constructor method
 
-    def __init__(self, keywords=["bezoldiging", "wnt"]):   
-        
+    def __init__(self, keywords=["bezoldiging", "wnt"]):           
         self.keywords = keywords
-
-
-
 
     def get_candidates(self, pdf_path="Type3.pdf"):
         pages = self.extract_pages_as_strings(pdf_path)

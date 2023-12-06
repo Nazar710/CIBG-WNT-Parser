@@ -9,10 +9,21 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from pdf2image import convert_from_path
 import shutil
+import sys
+
+
+def definePath(*folders:str):
+    """
+    ./folder1/folder2/folder3/.../folderN
+    defines an os agnostic path
+
+    definePath("OCR","tmpages") will results in ./OCR/tmppages  but in an os agnostic way
+    """
+    return os.path.join(os.curdir,*folders)
 
 class OCRMain:
     @staticmethod
-    def on_file(input_file: str, temp_output_folder: str = '../OCR/tmppages/'):
+    def on_file(input_file: str, temp_output_folder: str = definePath("OCR","tmppages")):
         """
         Args:
             input_file: path of the pdf file
@@ -25,13 +36,21 @@ class OCRMain:
         return [str(text_obj) for text_obj in text_objects]
 
     @staticmethod
-    def __extract_text_from_images(input_folder: str = '../OCR/tmppages/'):
+    def __extract_text_from_images(input_folder: str = definePath("OCR","tmppages")):
         '''
         Args:
             input_folder:   path to the folder where images are located
         Returns:            array with text objects where every index refers to a text object of a single page
         '''
-        OCRInstall.set_path()
+
+        if(sys.platform.startswith('win32')):
+            OCRInstall.set_path()
+
+        elif(sys.platform.startswith('linux')):
+            pass 
+        else:
+            print("YET UNSPECIFIED PLATFORM PLZ ADD SUPPORT IN ORC_MAIN: ")
+            exit()
 
         output_text = []
 
@@ -57,7 +76,7 @@ class OCRMain:
         return output_text
 
     @staticmethod
-    def __convert_pdf_to_img(input_file: str, output_folder: str ='../OCR/tmppages/'):
+    def __convert_pdf_to_img(input_file: str, output_folder: str =definePath("OCR","tmppages")):
         """
         Args:
             input_file: path to the pdf file
@@ -67,7 +86,13 @@ class OCRMain:
 
 
         # Store Pdf with convert_from_path function
-        images = convert_from_path(input_file,poppler_path = r"C:\Program Files\Poppler\poppler-23.11.0\Library\bin")
+        if(sys.platform.startswith('win32')):
+            images = convert_from_path(input_file,poppler_path = r"C:\Program Files\Poppler\poppler-23.11.0\Library\bin") #TODO edit this line if you use another path!!
+        elif(sys.platform.startswith('linux')):
+            images = convert_from_path(input_file)
+        else:
+            print("YET UNSPECIFIED PLATFORM PLZ ADD SUPPORT IN ORC_MAIN: ")
+            exit()
 
         # If folder doesn't exist, create it
         if not os.path.exists(output_folder):
@@ -75,11 +100,11 @@ class OCRMain:
 
         for i in range(len(images)):
             # Save pages as images to folder tmppages
-            images[i].save(output_folder + os.path.splitext(os.path.basename(input_file))[0] + '-' + str(i) + '.jpg', 'JPEG')
-
+            #images[i].save(output_folder + os.path.splitext(os.path.basename(input_file))[0] + '-' + str(i) + '.jpg', 'JPEG')
+            images[i].save(os.path.join(output_folder,os.path.splitext(os.path.basename(input_file))[0] + '-' + str(i) + '.jpg'), 'JPEG')
 
     @staticmethod
-    def extract_coordinate(image_file_name: str, coordinate_tuple: tuple, path: str = '../OCR/testfiles/', psm:int=6):
+    def extract_coordinate(image_file_name: str, coordinate_tuple: tuple, path: str = definePath("OCR","tmppages"), psm:int=6):
         """
         Scans specific coordinates within an image and outputs text
         It also plots the original and cropped image
@@ -93,7 +118,7 @@ class OCRMain:
 
         custom_config = r'--psm ' + str(psm)
 
-        img = Image.open(path + image_file_name)
+        img = Image.open(os.path.join(path,image_file_name))
         cropped_img = img.crop(coordinate_tuple)
         text = pytesseract.image_to_string(cropped_img, config=custom_config)
 

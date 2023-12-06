@@ -2,6 +2,7 @@ import pandas as pd
 from typing import Any
 from gridbased import table_extractor,table_analyser
 from candidates import CandidatePages
+from tqdm import tqdm 
 
 class WNT_analyser():
     def __init__(self,download_spacy:bool,gridtable_settings:dict={}) -> None:
@@ -21,24 +22,20 @@ class WNT_analyser():
         """
         full_wntInfoTable = pd.DataFrame({"name":[],"bezoldiging":[],"year":[],"page":[],"file":[]}) 
 
-        for path,file_name in self.table_extractor.recursiveFilePathIterator(folder_name,**kwargs):
+        for path,file_name in tqdm(self.table_extractor.recursiveFilePathIterator(folder_name,**kwargs),ascii=True):
             print(path)
-            print(file_name)
-            
-            #Text extraction (and OCR)
 
             #WNT page detector
             #....
-
+            wnt_pages = self.candidate_pages.get_candidates(path)
+            print("suggested_pages: ",wnt_pages)
 
             #gridbased 
-            try: #TODO remove this later when no longer testing paths and file extensions
-                extracted_tables, pages = self.table_extractor.extract_table(path,page_nums=None) #TODO provide page_nums
-                wntInfoTable = self.table_analyser.extractWNTInfo(extracted_tables,pages,file_name)
-                full_wntInfoTable = pd.concat((full_wntInfoTable,wntInfoTable),ignore_index=True)
+            extracted_tables, pages = self.table_extractor.extract_table(path,page_nums=wnt_pages) #TODO provide page_nums
+            wntInfoTable = self.table_analyser.extractWNTInfo(extracted_tables,pages,file_name)
+            full_wntInfoTable = pd.concat((full_wntInfoTable,wntInfoTable),ignore_index=True)
 
-            except:
-                pass 
+ 
         print(full_wntInfoTable)
         return full_wntInfoTable
 
@@ -79,8 +76,8 @@ step 2 notes:
 
 if __name__ == "__main__":
     #general settings 
-    download_spacy = True
+    download_spacy = False
     folder_name = ""
     #method
     WNT_analysor = WNT_analyser(download_spacy) 
-    WNT_analysor("eval_data",accepted_formats=["txt","pdf"])
+    WNT_analysor("sorted",accepted_formats=["txt","pdf"])
