@@ -18,11 +18,11 @@ class candidates():
             textpage = page.get_textpage()
 
             # Extract text from the whole page 
-            text = textpage.get_text_range().lower()
+            text = textpage.get_text_range()
             if(len(text) > 0):
                 hasText = True
             
-            if(all(keyword.lower() in text for keyword in self.keywords)):
+            if(self.isCandidate(text)):
                 candidate_pages.append(page_num)
 
         #use OCR if no text
@@ -30,15 +30,21 @@ class candidates():
             pages = OCRMain.on_file(pdf_path)
             for page_num,page in enumerate(pages):
                 
-                text = page.lower()
-                if(all(keyword.lower() in text for keyword in self.keywords)):
+                if(self.isCandidate(page)):
                     candidate_pages.append(page_num)
 
         return candidate_pages
+
+    def isCandidate(self,page:str) -> bool:
+        text = page.lower()
+        return all(keyword.lower() in text for keyword in self.keywords)
+
 
 
 if __name__ == "__main__":
     can = candidates() 
     wnt_candidates = can.get_candidates("./wnt_not_scanned.pdf") 
+    print(wnt_candidates)
     wnt_candidates = can.get_candidates("./wnt_scan.pdf") 
+    print(wnt_candidates)
 
