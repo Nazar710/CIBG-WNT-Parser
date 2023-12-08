@@ -10,7 +10,7 @@ from PIL import Image
 from pdf2image import convert_from_path
 import shutil
 import sys
-
+from tqdm import tqdm 
 
 def definePath(*folders:str):
     """
@@ -58,7 +58,7 @@ class OCRMain:
         image_files = [f for f in os.listdir(input_folder) if
                        f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
 
-        for image_file in image_files:
+        for image_file in tqdm(image_files,ascii=True,desc="ocr_part2"):
             # Construct full path for the image
             image_path = os.path.join(input_folder, image_file)
 
@@ -98,7 +98,7 @@ class OCRMain:
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
 
-        for i in range(len(images)):
+        for i in tqdm(range(len(images)),ascii=True,desc="ocr_part1"):
             # Save pages as images to folder tmppages
             #images[i].save(output_folder + os.path.splitext(os.path.basename(input_file))[0] + '-' + str(i) + '.jpg', 'JPEG')
             images[i].save(os.path.join(output_folder,os.path.splitext(os.path.basename(input_file))[0] + '-' + str(i) + '.jpg'), 'JPEG')

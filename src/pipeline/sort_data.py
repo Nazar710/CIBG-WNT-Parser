@@ -9,7 +9,6 @@ builds file structure and moves all files from the unsorted root folder (and all
 to the sorted struct given information from WNT_labels.xlsx and File_labels.xlsx 
 """
 
-
 if __name__ == "__main__": 
     to_be_sorted_root_folder_name = "unsorted" #make sure this root folder is in the same folder as sort_data.py
 
