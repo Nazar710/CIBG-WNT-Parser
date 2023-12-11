@@ -56,13 +56,7 @@ class Evaluator():
         recall = relevant_names_retrieved/relevant_names
         print("precision: ", precision)
         print("recall", recall)
-        
-        
-        
-        
-        
-       
-            
+                    
 if __name__ == "__main__":
     #general settings 
     eval= Evaluator()
