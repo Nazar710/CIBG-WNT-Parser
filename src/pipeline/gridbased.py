@@ -24,6 +24,8 @@ class table_extractor():
         """
         with pdfplumber.open(path) as file:
             if(page_nums is not None):
+                print("path: " + path)
+                print("pages ", page_nums)
                 table_pagenum_list= [(pd.DataFrame(table.extract()),page_num) for page_num in page_nums for table in file.pages[page_num].find_tables(table_settings=self.table_settings)] 
             else:
                 table_pagenum_list= [(pd.DataFrame(table.extract()),page.page_number) for page in file.pages for table in page.find_tables(table_settings=self.table_settings)]
