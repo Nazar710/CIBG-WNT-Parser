@@ -8,8 +8,6 @@ import numpy as np
 from thefuzz import fuzz
 import spacy
 
-
-
 class table_extractor():
     """
     extractor for gridbased and free text

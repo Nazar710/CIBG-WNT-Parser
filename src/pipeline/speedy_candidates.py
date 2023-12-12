@@ -1,6 +1,9 @@
 import pypdfium2 as pdfium
 from tqdm import tqdm 
 from ocr_main import OCRMain
+from gridbased import table_extractor
+import pandas as pd 
+from time import time
 
 
 class candidates():
@@ -43,8 +46,18 @@ class candidates():
 
 if __name__ == "__main__":
     can = candidates() 
-    wnt_candidates = can.get_candidates("./wnt_not_scanned.pdf") 
-    print(wnt_candidates)
-    wnt_candidates = can.get_candidates("./wnt_scan.pdf") 
-    print(wnt_candidates)
-
+    # wnt_candidates = can.get_candidates("./wnt_not_scanned.pdf") 
+    # print(wnt_candidates)
+    # wnt_candidates = can.get_candidates("./wnt_scan.pdf") 
+    # print(wnt_candidates)
+    df = pd.DataFrame({"filename":[],"results":[]})
+    t0 = time()
+    
+    for path,file_name in table_extractor.recursiveFilePathIterator("./allPDF_1"):
+        
+        df_row = pd.DataFrame({"filename":[file_name],"results":[can.get_candidates(path)]})
+        
+        df = pd.concat([df,df_row],ignore_index=True)
+    t1 = time() - t0
+    print(t1)
+    df.to_csv("speedy_candidates_results.csv")

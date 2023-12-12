@@ -32,8 +32,17 @@ class OCRMain:
         """
         OCRMain.__convert_pdf_to_img(input_file, temp_output_folder)
         text_objects = OCRMain.__extract_text_from_images(temp_output_folder)
+        OCRMain.clean_tmp_folder(temp_output_folder)
 
         return [str(text_obj) for text_obj in text_objects]
+
+    @staticmethod
+    def clean_tmp_folder(temp_output_folder:str) -> None:
+        """
+        removes the temporary folder to clean it up.
+        """
+        shutil.rmtree(temp_output_folder)
+
 
     @staticmethod
     def __extract_text_from_images(input_folder: str = definePath("OCR","tmppages")):
