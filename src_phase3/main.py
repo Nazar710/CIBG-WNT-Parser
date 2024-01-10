@@ -117,5 +117,4 @@ class a1checker():
 
 if __name__ == "__main__":
 
-    extractObj = extractor() 
-    extractObj.recursiveFilePathIterator()
+    extractObj = extractor("pdfs") 
