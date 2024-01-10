@@ -1,5 +1,3 @@
-
-
 """
 wrapper class for PDF file and its candidate pages
 author: john nazarenko 
@@ -151,3 +149,6 @@ class PDF_wrapper:
         def __repr__(self):
             return f"candidate_pages({self.parent_pdf}, {self.page_number}, {self.selectable}, {self.scanned}, {self.has_1a_table}, {self.csv_path})"
         
+       
+
+           

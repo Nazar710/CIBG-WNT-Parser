@@ -5,7 +5,7 @@ from functools import partial
 import numpy as np
 import pandas as pd
 import pdfplumber
-
+from pdfWrapper import PDF_wrapper
 
 class pdf():
     def __init__(self,path:str,file_name:str,tables:list[tuple[int,pd.DataFrame]]=None) -> None:
@@ -140,7 +140,6 @@ if __name__ == "__main__":
     threshold = 0.7
     standardTables = []
 
-
     for pdf_obj in extractObj.extract("pdfs"):
         for table in pdf_obj.tables[0]:
             # print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
@@ -149,8 +148,7 @@ if __name__ == "__main__":
             for keyword in checker.column_names:
                 if(len(checker.findFuzzyMatchInTable(table,keyword,threshold)) == 0):
                     isStandard = False                      
-                    break 
-                
-            
+                    break
+
             if(isStandard):
                 standardTables.append((pdf_obj,table))
