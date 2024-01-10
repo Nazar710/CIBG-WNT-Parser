@@ -138,9 +138,19 @@ if __name__ == "__main__":
     checker = a1checker()
 
     threshold = 0.7
+    standardTables = []
+
 
     for pdf_obj in extractObj.extract("pdfs"):
         for table in pdf_obj.tables[0]:
-            print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
-            print(checker.findFuzzyMatchInTable(table,checker.column_names[0],threshold))
-            exit()
+            # print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
+            # print(checker.findFuzzyMatchInTable(table,checker.column_names[0],threshold))
+            isStandard = True
+            for keyword in checker.column_names:
+                if(len(checker.findFuzzyMatchInTable(table,keyword,threshold)) == 0):
+                    isStandard = False                      
+                    break 
+                
+            
+            if(isStandard):
+                standardTables.append((pdf_obj,table))
