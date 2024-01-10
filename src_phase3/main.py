@@ -1,18 +1,30 @@
-import os 
+import os
 from typing import Generator
 from thefuzz import fuzz
-from functools import partial 
-import numpy as np 
-import pandas as pd  
-import pdfplumber 
-from pdfWrapper import PDF_wrapper
+from functools import partial
+import numpy as np
+import pandas as pd
+import pdfplumber
+
+
+class pdf():
+    def __init__(self,path:str,file_name:str,tables:list[tuple[int,pd.DataFrame]]=None) -> None:
+        self.path = path 
+        self.file_name = file_name
+        if(tables is None):
+            self.tables = [] #tables combined with page number [(table,page_num),(table,page_num),(table,page_num)]
+        else:
+            self.tables = tables 
+
+    def append(self,obj:pd.DataFrame,page_num:int) -> None:
+        self.tables.append((obj,page_num))
 
 
 class extractor():
     def __init__(self,table_settings:dict={}) -> None:
         self.table_settings = table_settings
         
-    def extract_table(path:str,page_nums:list[int]=None) -> tuple[list[pd.DataFrame],list[int]]:
+    def extract_table(self,path:str,page_nums:list[int]=None) -> tuple[list[pd.DataFrame],list[int]]:
         """
         extracts tables at the corresponding page or all tables from the entire document if no page numbers are provided. (so if page_nums = None)
         returns 2 lists, 1 with the tables and 1 with the page number for each table
@@ -21,20 +33,26 @@ class extractor():
             if(page_nums is not None):
                 print("path: " + path)
                 print("pages ", page_nums)
-                table_pagenum_list= [(pd.DataFrame(table.extract()),page_num) for page_num in page_nums for table in file.pages[page_num].find_tables(table_settings=self.table_settings)] 
+                table_pagenum_list = [(pd.DataFrame(table.extract()),page_num) for page_num in page_nums for table in file.pages[page_num].find_tables(table_settings=self.table_settings)] 
             else:
-                table_pagenum_list= [(pd.DataFrame(table.extract()),page.page_number) for page in file.pages for table in page.find_tables(table_settings=self.table_settings)]
-            
+                table_pagenum_list = [(pd.DataFrame(table.extract()),page.page_number) for page in file.pages for table in page.find_tables(table_settings=self.table_settings)]
+
             tables = [table_and_page[0] for table_and_page in table_pagenum_list]
             page_nums = [table_and_page[1] for table_and_page in table_pagenum_list]
-            return tables,page_nums    
+            return tables,page_nums
 
-    @staticmethod
-    def extract(folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]):
+    def extract(self,folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]):
         """
         goes over all the pdfs in the specified folder and returns pdf objects
-        
         """
+        pdfsobj_list = []
+
+        for path,file_name in extractor.recursiveFilePathIterator(folder_name,accepted_formats):
+            tables = self.extract_table(path)
+            pdf_obj = pdf(file_name,path,tables)
+            pdfsobj_list.append(pdf_obj)
+            
+        return pdfsobj_list
 
     @staticmethod 
     def recursiveFilePathIterator(folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> Generator:
@@ -44,8 +62,8 @@ class extractor():
         """
         root_path = os.path.join(os.curdir,folder_name)
 
-        def recursiveIterator(current_folder_path:str):        
-            for folder_elem in os.listdir(current_folder_path): 
+        def recursiveIterator(current_folder_path:str):
+            for folder_elem in os.listdir(current_folder_path):
 
                 current_path = os.path.join(current_folder_path,folder_elem)
 
@@ -62,8 +80,7 @@ class extractor():
             for path,file_name in recursiveIterator(root_path):
                 yield path,file_name
         else:
-            yield None, None
-
+            yield None, None 
 
 class a1checker():
     def __init__(self) -> None:
@@ -83,16 +100,14 @@ class a1checker():
         "Toelichting op de vordering wegens onverschuldigde betaling"
         ]
     
-    
     def fuzzyElemMatching(self,table_elem:str,targetWord:str,threshold:float) -> bool:
         """
         treshold is between [0,1]
         checks if a word is close enough to a target word given some treshold measured.
         using fuzzy ratio matching
         """
-
         if(table_elem is None):
-            return False 
+            return False
 
         table_elem = table_elem.lower()
         targetWord = targetWord.lower()
@@ -108,14 +123,24 @@ class a1checker():
         it's more than the threshold we will accept that there is word at that position.
 
         returns [np.array[x,y],np.array[x,y]] for each element in the table that is in the right format
-        """
 
-        masked_table = table.map(partial(self.fuzzyElemMatching,threshold=threshold,targetWord=targetWord)).to_numpy()
-        x,y = masked_table.nonzero()
+
+        the result will always be x = row y = column. position is [row,column]
+        """
+        boolean_table = table.map(partial(self.fuzzyElemMatching,threshold=threshold,targetWord=targetWord)).to_numpy()
+        x,y = boolean_table.nonzero()
         positions = np.concatenate((np.expand_dims(x,axis=1),np.expand_dims(y,axis=1)),axis=1)
         
         return [pos for pos in positions]
 
 if __name__ == "__main__":
+    extractObj = extractor() 
+    checker = a1checker()
 
-    extractObj = extractor("pdfs") 
+    threshold = 0.7
+
+    for pdf_obj in extractObj.extract("pdfs"):
+        for table in pdf_obj.tables[0]:
+            print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
+            print(checker.findFuzzyMatchInTable(table,checker.column_names[0],threshold))
+            exit()
