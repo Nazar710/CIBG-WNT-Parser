@@ -5,6 +5,7 @@ from functools import partial
 import numpy as np 
 import pandas as pd  
 import pdfplumber 
+from pdfWrapper import PDF_wrapper
 
 
 class extractor():
