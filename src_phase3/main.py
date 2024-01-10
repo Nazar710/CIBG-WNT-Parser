@@ -4,10 +4,29 @@ from thefuzz import fuzz
 from functools import partial 
 import numpy as np 
 import pandas as pd  
+import pdfplumber 
+
 
 class extractor():
     def __init__(self) -> None:
         pass 
+
+    def extract_table(self,path:str,page_nums:list[int]=None) -> tuple[list[pd.DataFrame],list[int]]:
+        """
+        extracts tables at the corresponding page or all tables from the entire document if no page numbers are provided. (so if page_nums = None)
+        returns 2 lists, 1 with the tables and 1 with the page number for each table
+        """
+        with pdfplumber.open(path) as file:
+            if(page_nums is not None):
+                print("path: " + path)
+                print("pages ", page_nums)
+                table_pagenum_list= [(pd.DataFrame(table.extract()),page_num) for page_num in page_nums for table in file.pages[page_num].find_tables(table_settings=self.table_settings)] 
+            else:
+                table_pagenum_list= [(pd.DataFrame(table.extract()),page.page_number) for page in file.pages for table in page.find_tables(table_settings=self.table_settings)]
+            
+            tables = [table_and_page[0] for table_and_page in table_pagenum_list]
+            page_nums = [table_and_page[1] for table_and_page in table_pagenum_list]
+            return tables,page_nums    
 
     @staticmethod
     def extract(folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]):
@@ -98,4 +117,5 @@ class a1checker():
 
 if __name__ == "__main__":
 
-    pass 
+    extractObj = extractor() 
+    extractObj.recursiveFilePathIterator()
