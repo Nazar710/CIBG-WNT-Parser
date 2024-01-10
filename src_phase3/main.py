@@ -8,10 +8,10 @@ import pdfplumber
 
 
 class extractor():
-    def __init__(self) -> None:
-        pass 
-
-    def extract_table(self,path:str,page_nums:list[int]=None) -> tuple[list[pd.DataFrame],list[int]]:
+    def __init__(self,table_settings:dict={}) -> None:
+        self.table_settings = table_settings
+        
+    def extract_table(path:str,page_nums:list[int]=None) -> tuple[list[pd.DataFrame],list[int]]:
         """
         extracts tables at the corresponding page or all tables from the entire document if no page numbers are provided. (so if page_nums = None)
         returns 2 lists, 1 with the tables and 1 with the page number for each table
