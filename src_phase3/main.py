@@ -84,7 +84,7 @@ class extractor():
 
 class a1checker():
     def __init__(self) -> None:
-        self.column_names = [
+        self.data_points = [
         "Naam",
         "Functiegegevens",
         "Aanvang en einde functievervulling in 2023",
@@ -133,22 +133,38 @@ class a1checker():
         
         return [pos for pos in positions]
 
+    def is1aOrNot(self, threshold):
+        default_list = [False] * 13
+        print(default_list)
+        index = 0;
+        for datapoint in checker.data_points:
+            print(datapoint)
+            standardTables = []
+            for pdf_obj in extractObj.extract("pdfs"):
+                for table in pdf_obj.tables[0]:
+                    # print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
+                    print(checker.findFuzzyMatchInTable(table, datapoint, threshold))
+                    isStandard = True
+                    if (len(checker.findFuzzyMatchInTable(table, datapoint, threshold)) == 0):
+                        isStandard = False
+                        break
+                    else:
+                        default_list[index] = True
+                        print("datapoint: ", datapoint)
+                    if (isStandard):
+                        standardTables.append((pdf_obj, table))
+            index += 1
+        print (default_list)
+        count_true = default_list.count(True)
+        if count_true >=10:
+            print("Found ", count_true, "datapoints.", "this is 1a Table")
+        else:
+            print("Found ", count_true, "datapoints", "Not 1a Table")
+
 if __name__ == "__main__":
-    extractObj = extractor() 
+    extractObj = extractor()
     checker = a1checker()
-
     threshold = 0.7
-    standardTables = []
+    checker.is1aOrNot(threshold)
 
-    for pdf_obj in extractObj.extract("pdfs"):
-        for table in pdf_obj.tables[0]:
-            # print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
-            # print(checker.findFuzzyMatchInTable(table,checker.column_names[0],threshold))
-            isStandard = True
-            for keyword in checker.column_names:
-                if(len(checker.findFuzzyMatchInTable(table,keyword,threshold)) == 0):
-                    isStandard = False                      
-                    break
 
-            if(isStandard):
-                standardTables.append((pdf_obj,table))
