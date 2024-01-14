@@ -18,7 +18,9 @@ class PDFViewer:
         self.root = TkinterDnD.Tk()
         self.root.title('extracted tables')
         self.wrapperList = wrapperlist
-        self.root.geometry("600x800")
+        width= self.root.winfo_screenwidth() 
+        height= self.root.winfo_screenheight()
+        self.root.geometry("%dx%d" % (width, height))
         # Create the Treeview
         self.tree = ttk.Treeview(self.root)
 
@@ -42,10 +44,28 @@ class PDFViewer:
         self.load_wrapper(wrapperlist)
 
         # Bind the select event
-        self.tree.bind('<<TreeviewSelect>>', self.on_pdf_select)
+        self.tree.bind('<Double-1>', self.on_pdf_select)
 
-        self.tree.pack(fill=tk.BOTH, expand=True)
+        self.tree.pack(side= "bottom",fill=tk.BOTH, expand=True)
+        #add approve buttons
+        approve_buttons = tk.Frame(self.root)
+        
+        approve_button = tk.Button(approve_buttons, text="Approve", command=self.approve_selected)
+        approve_button.pack(side="left")
+        
+        approve_all_button = tk.Button(approve_buttons, text="Approve All", command=self.approve_all)
+        approve_all_button.pack(side = "right")
+        
+        approve_buttons.pack(side = "top")
+        
+    def approve_selected(self):
+        selected_items = self.tree.selection()
+        for item in selected_items:
+            self.tree.delete(item)
 
+    def approve_all(self):
+        self.root.destroy()
+    
     def load_wrapper(self, wrapperlist):
         """Load all the pdf's that are in the wrapper list."""
         for pdfwrap in wrapperlist:
@@ -131,7 +151,7 @@ class PDFViewer:
         self.add_column_button = tk.Button(buttons, text='Add Column', command=self.add_column)
         self.add_column_button.pack()
 
-        self.save_file_button = tk.Button(buttons, text='Confirm changes', command=self.save_changes)
+        self.save_file_button = tk.Button(buttons, text='Save changes', command=self.save_changes)
         self.save_file_button.pack()
         
         self.undo_button = tk.Button(buttons, text='Undo Changes', command=self.undo_changes)
@@ -147,19 +167,20 @@ class PDFViewer:
             self.df = self.df_backup.copy()
             self.table.model.df = self.df
             self.table.redraw()
-            self.save_changes()
+            self.save_changes(False)
         
         
-    def save_changes(self):
+    def save_changes(self, show_popup: bool = True):
         if ".xlsx" in self.file_name_original_csv:
             self.df.to_excel(self.file_name_original_csv, index=False)
         else:
             self.df.to_csv(self.file_name_original_csv, index = False)
-        popup = tk.Toplevel(self.window)
-        popup.title("Save Confirmation")
-        label = tk.Label(popup, text="changes saved")
-        label.pack()
-        popup.after(1000, popup.destroy)
+        if show_popup: 
+            popup = tk.Toplevel(self.window)
+            popup.title("Save Confirmation")
+            label = tk.Label(popup, text="changes saved")
+            label.pack()
+            popup.after(1000, popup.destroy)
         
 
     def create_new_1a(self, csv_path, target_folder, file_name):
@@ -207,7 +228,15 @@ class PDFViewer:
         # Display the PDF and the table in the new window
         self.display_pdf(pdf_name, page - 1, new_window)
         self.display_table(csv_file, new_window,pdf_name)
+        
+        
 
+    def approve_and_close(self, window, item):
+        # Close the PDF + table window
+        window.destroy()
+
+        # Remove the item from the list in the main window
+        self.tree.delete(item)
  
     def run(self):
         """Start the GUI loop."""
