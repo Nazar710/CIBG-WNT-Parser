@@ -74,6 +74,7 @@ class PDF_wrapper:
             _scanned (bool): True if the page is scanned, False otherwise.
             _has_1a_table (bool): True if the page contains a 1a table, False otherwise.
             _csv_path (str): The file path to the CSV representation of the page.
+            _csv_method (str): the method that created the CSV representation of the page.
             _file_path (str): the file path to the pdf that the page is in.
 
         Methods:
@@ -83,9 +84,10 @@ class PDF_wrapper:
             has_1a_table: Get or set the presence of a 1a table.
             csv_path: Get or set the CSV file path.
             get_file_name: Get the file name of the parent PDF.
+            
         """
 
-        def __init__(self, parent_pdf, page_number, selectable, scanned, has_1a_table, csv_path, pdf_path):
+        def __init__(self, parent_pdf, page_number, selectable, scanned, has_1a_table, csv_path, pdf_path, csv_method):
             """
             Constructs all the necessary attributes for the candidate_pages object.
 
@@ -97,6 +99,7 @@ class PDF_wrapper:
                 has_1a_table (bool): True if the page contains a 1a table, False otherwise.
                 csv_path (str): The file path to the CSV representation of the page.
             """
+            self._csv_method = csv_method
             self.parent_pdf = parent_pdf
             self._page_number = page_number
             self._selectable = selectable
@@ -110,6 +113,10 @@ class PDF_wrapper:
         def pdf_path(self):
             """get or set the pdf path of the file in which the page is located"""
             return self._pdf_path
+        @property
+        def csv_method(self):
+            """get or set the method that constructed the csv representation of this page"""
+            return self._csv_method
         
         @property
         def page_number(self):

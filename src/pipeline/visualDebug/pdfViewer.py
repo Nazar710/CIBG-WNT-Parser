@@ -16,24 +16,27 @@ class PDFViewer:
 
     def __init__(self, wrapperlist):
         self.root = TkinterDnD.Tk()
-        self.root.title('Flagged Files')
+        self.root.title('extracted tables')
         self.wrapperList = wrapperlist
-
+        self.root.geometry("600x800")
         # Create the Treeview
         self.tree = ttk.Treeview(self.root)
 
         # Define columns
-        self.tree['columns'] = ('file_name', 'page_number')
+        self.tree['columns'] = ('file_name', 'page_number', 'csv_file', 'status')
 
         # Format columns
         self.tree.column('#0', width=0, stretch=tk.NO)
         self.tree.column('file_name', anchor=tk.W, width=120)
         self.tree.column('page_number', anchor=tk.CENTER, width=80)
+        self.tree.column('status', anchor=tk.CENTER, width=80)
 
         # Create headings
         self.tree.heading('#0', text='', anchor=tk.W)
         self.tree.heading('file_name', text='File Name', anchor=tk.W)
         self.tree.heading('page_number', text='Page Number', anchor=tk.CENTER)
+        self.tree.heading("csv_file", text = 'csv_file', anchor = tk.CENTER)
+        self.tree.heading("status", text = 'status', anchor = tk.CENTER)
 
         # Add data to the treeview
         self.load_wrapper(wrapperlist)
@@ -48,7 +51,7 @@ class PDFViewer:
         for pdfwrap in wrapperlist:
             for page in pdfwrap.pages:
                 if page.has_1a_table:
-                    self.tree.insert('', 'end', values=(page.pdf_path, page.page_number))
+                    self.tree.insert('', 'end', values=(page.pdf_path, page.page_number, page.csv_path, "certain"))
 
     def display_pdf(self, pdf_path, target_page, new_window):
         """Open a PDF file in a new window with navigation buttons, zoom functionality, and scrollbars."""
@@ -163,7 +166,7 @@ class PDFViewer:
         """Handle the selection of a PDF file from the Treeview."""
         w = event.widget
         selected_item = w.selection()[0]  # Get selected item
-        pdf_name, page_str = w.item(selected_item, 'values')
+        pdf_name, page_str, csv_file, status = w.item(selected_item, 'values')
         page = int(page_str)
 
         # Create a new window to display the PDF
@@ -184,7 +187,7 @@ class PDFViewer:
 # pdf_files = [f for f in os.listdir(folder_path) if f.endswith('.pdf')]
 wrappers = []
 wrapper1 = PDF_wrapper("wnt_not_scanned","src\pipeline\wnt_not_scanned.pdf")
-wrapper1.add_page(35,True,False,True,"")
+wrapper1.add_page(35,True,False,True,"src/pipeline/visualDebug/1a_template.xlsx")
 wrappers.append(wrapper1)
 viewer = PDFViewer(wrappers)
 viewer.run()
