@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import fitz 
 import datetime
-from tkinter import Canvas, Scrollbar, ttk
+from tkinter import Canvas, Scrollbar, ttk, messagebox
 from PIL import Image, ImageTk
 import os, sys
 import pandas as pd
@@ -51,7 +51,7 @@ class PDFViewer:
         for pdfwrap in wrapperlist:
             for page in pdfwrap.pages:
                 if page.has_1a_table:
-                    self.tree.insert('', 'end', values=(page.pdf_path, page.page_number, page.csv_path, "certain"))
+                    self.tree.insert('', 'end', values=(page.pdf_path, page.page_number, page.csv_path, page.csv_method))
 
     def display_pdf(self, pdf_path, target_page, new_window):
         """Open a PDF file in a new window with navigation buttons, zoom functionality, and scrollbars."""
@@ -110,30 +110,60 @@ class PDFViewer:
             next_button['state'] = tk.NORMAL if self.current_page_number < pdf.page_count - 1 else tk.DISABLED
         check_buttons()
         
-    def display_table(self,csv_path,window):
+    def display_table(self,csv_path,window,pdf_name):
         f = tk.Frame(window, width=650, height=800)
         f.pack(side = "right", fill="none", expand=True)
-        self.file_name_original_pdf = '1a_test.xlsx'
-        self.create_new_1a(file_name=self.file_name_original_pdf)
-        # Load the dataframe and set it as an instance attribute
-        self.df = pd.read_excel(self.file_name_original_pdf)
-
+        self.file_name_original_csv = csv_path
+        self.window = window
+        # just for testing: check if the csv is in excel format and handle it as excel, otherwise as csv
+        if ".xlsx" in csv_path:
+            self.df = pd.read_excel(self.file_name_original_csv)
+        else:
+            self.df = pd.read_csv(self.file_name_original_csv)
+        
+        # Create a backup of the DataFrame
+        self.df_backup = self.df.copy() 
+        
         self.table = Table(f, dataframe=self.df, showtoolbar=True, showstatusbar=True, maxcellwidth=200, height = 600, width = 2000)
         self.table.show()
+        
         buttons = tk.Frame(f)
         self.add_column_button = tk.Button(buttons, text='Add Column', command=self.add_column)
         self.add_column_button.pack()
 
-        self.save_file_button = tk.Button(buttons, text='Save WNT edits', command=self.save_changes)
+        self.save_file_button = tk.Button(buttons, text='Confirm changes', command=self.save_changes)
         self.save_file_button.pack()
+        
+        self.undo_button = tk.Button(buttons, text='Undo Changes', command=self.undo_changes)
+        self.undo_button.pack()
+        buttons.grid(row=0, column=0)
+        
         buttons.grid(row = 0, column = 0)
         
+    
+    def undo_changes(self):
+        response = messagebox.askyesno("Confirm Undo", "Are you sure you want to undo all changes?",parent = self.window)
+        if response:
+            self.df = self.df_backup.copy()
+            self.table.model.df = self.df
+            self.table.redraw()
+            self.save_changes()
+        
+        
     def save_changes(self):
-        self.df.to_excel(self.file_name_original_pdf, index=False)
-        print("Changes saved to Excel!")
+        if ".xlsx" in self.file_name_original_csv:
+            self.df.to_excel(self.file_name_original_csv, index=False)
+        else:
+            self.df.to_csv(self.file_name_original_csv, index = False)
+        popup = tk.Toplevel(self.window)
+        popup.title("Save Confirmation")
+        label = tk.Label(popup, text="changes saved")
+        label.pack()
+        popup.after(1000, popup.destroy)
+        
 
-    def create_new_1a(self, src: str = 'src/pipeline/visualDebug/1a_template.xlsx', target_folder: str = '', file_name: str = '1a_test.xlsx'):
-        workbook = openpyxl.load_workbook(src)
+    def create_new_1a(self, csv_path, target_folder, file_name):
+        workbook = openpyxl.load_workbook(csv_path)
 
         target_path = os.path.join(target_folder, file_name)
 
@@ -147,11 +177,11 @@ class PDFViewer:
 
     def add_column(self):
         template_excel_column = 'src/pipeline/visualDebug/1a_template.xlsx'
-        template_column = pd.read_excel(template_excel_column, usecols=['Persoon 1'])
+        template_column = pd.read_excel(template_excel_column, usecols=['Persoon 1']).squeeze()
 
         # Ensure the new column length matches the DataFrame's length
         while len(template_column) < len(self.df):
-            template_column = template_column.append(pd.Series([None]), ignore_index=True)
+            template_column = pd.concat([template_column,pd.Series([None])], ignore_index=True)
         template_column = template_column[:len(self.df)]
 
         col_name = f"Persoon {len(self.df.columns)}"
@@ -166,7 +196,7 @@ class PDFViewer:
         """Handle the selection of a PDF file from the Treeview."""
         w = event.widget
         selected_item = w.selection()[0]  # Get selected item
-        pdf_name, page_str, csv_file, status = w.item(selected_item, 'values')
+        pdf_name, page_str, csv_file, csv_method = w.item(selected_item, 'values')
         page = int(page_str)
 
         # Create a new window to display the PDF
@@ -176,7 +206,7 @@ class PDFViewer:
 
         # Display the PDF and the table in the new window
         self.display_pdf(pdf_name, page - 1, new_window)
-        self.display_table('src/pipeline/visualDebug/1a_template.xlsx', new_window)
+        self.display_table(csv_file, new_window,pdf_name)
 
  
     def run(self):
@@ -187,7 +217,10 @@ class PDFViewer:
 # pdf_files = [f for f in os.listdir(folder_path) if f.endswith('.pdf')]
 wrappers = []
 wrapper1 = PDF_wrapper("wnt_not_scanned","src\pipeline\wnt_not_scanned.pdf")
-wrapper1.add_page(35,True,False,True,"src/pipeline/visualDebug/1a_template.xlsx")
+wrapper1.add_page(35,True,False,True,'src\pipeline\speedy_candidates_results.csv', "exact match coördinate")
 wrappers.append(wrapper1)
+wrapper2 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
+wrapper2.add_page(34,False,True,True,"src/pipeline/visualDebug/1a_template.xlsx", "ocr")
+wrappers.append(wrapper2)
 viewer = PDFViewer(wrappers)
 viewer.run()
