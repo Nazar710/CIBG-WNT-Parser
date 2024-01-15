@@ -86,21 +86,23 @@ class SearchablePDFConverter:
         # Return the final searchable PDF for the specified page
         return pdf_writer
 
-# Example usage of the SearchablePDFConverter class
 
-# Replace 'path_to_input_pdf.pdf' with the actual path to your input PDF file
-input_pdf_path = 'pdfs/DigiMV2020_NZZ7VU7B27_0_27047100_Jaarrekening_9355_Kessler Stichting.pdf'
+if __name__ == "__main__":
+    # Example usage of the SearchablePDFConverter class
 
-# Replace 'path_to_tesseract_executable' with the actual path to your Tesseract OCR executable
-tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
+    # Replace 'path_to_input_pdf.pdf' with the actual path to your input PDF file
+    input_pdf_path = 'pdfs/DigiMV2020_NZZ7VU7B27_0_27047100_Jaarrekening_9355_Kessler Stichting.pdf'
 
-# Create an instance of SearchablePDFConverter
-pdf_converter = SearchablePDFConverter(input_pdf_path, tesseract_cmd_path)
+    # Replace 'path_to_tesseract_executable' with the actual path to your Tesseract OCR executable
+    tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
 
-# Example 2: Convert a specific page of the PDF to a searchable PDF with post-processing
-page_number_to_convert = 78  # Replace with the desired page number
-searchable_pdf_page = pdf_converter.convert_to_searchable_pdf_page(page_number_to_convert)
+    # Create an instance of SearchablePDFConverter
+    pdf_converter = SearchablePDFConverter(input_pdf_path, tesseract_cmd_path)
 
-# Save the output searchable PDF for the specific page to a file
-searchable_pdf_page_output_path = f'tempSearchable.pdf'
-searchable_pdf_page.save(searchable_pdf_page_output_path)
+    # Example 2: Convert a specific page of the PDF to a searchable PDF with post-processing
+    page_number_to_convert = 78  # Replace with the desired page number
+    searchable_pdf_page = pdf_converter.convert_to_searchable_pdf_page(page_number_to_convert)
+
+    # Save the output searchable PDF for the specific page to a file
+    searchable_pdf_page_output_path = f'tempSearchable.pdf'
+    searchable_pdf_page.save(searchable_pdf_page_output_path)

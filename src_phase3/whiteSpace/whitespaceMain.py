@@ -1,13 +1,12 @@
 import pandas as pd
-from FindBezoldiging import FinderAlgorithm  # Make sure to import the correct module
-from nameFind import KeywordFinder
+from .FindBezoldiging import FinderAlgorithm  # Make sure to import the correct module
+from .nameFind import KeywordFinder
 
 class PDFProcessor:
     def __init__(self):
         self.results = []
 
     def process_pdf(self, pdf_path, target_page, names):
-        pdf_path = f"pdfs/{pdf_path}.pdf"
         
         try:
             target_page = int(target_page)
@@ -26,6 +25,18 @@ class PDFProcessor:
             })
         else:
             print("Invalid input values.")
+
+    def return_results(self) -> list[pd.DataFrame]:
+        """
+        return list of dataframes
+        """
+
+        return [pd.DataFrame(result['result_list'], columns=[
+                'Name', 'Bezoldiging', 'Functie', 'functievervullingString',
+                'Dienstverband', 'Dienstbetrekking', 'Beloning', 'Beloningen',
+                'Subtotaal', 'Bezoldigingsmaximum', 'Onverschuldigd',
+                'Overschrijding', 'Toelichting'
+            ]) for result in self.results] 
 
     def save_results_to_csv(self, output_csv_path):
 
@@ -65,16 +76,19 @@ class PDFProcessor:
                 print("N-------------------------------------------------N")
 
 
-# Example Usage:
-  
-pdf_path="DigiMV2020_7FMRR3X2P7_0_05072572_Jaarrekening_6286_Stichting ZGR"
-pagenumber=30
-keyword_finder = KeywordFinder(f"pdfs/{pdf_path}.pdf")
-result = keyword_finder.find_keywords_with_context(pagenumber)
-keyword_finder.close()
-listofnames=result               
+if __name__ == "__main__":
+    
 
-pdf_processor = PDFProcessor()
-pdf_processor.process_pdf(pdf_path=pdf_path, target_page=pagenumber, names=listofnames)
-pdf_processor.save_results_to_csv(output_csv_path='output_results.csv')
-pdf_processor.display_results()
+    # Example Usage:
+    
+    pdf_path="DigiMV2020_7FMRR3X2P7_0_05072572_Jaarrekening_6286_Stichting ZGR"
+    pagenumber=30
+    keyword_finder = KeywordFinder(f"pdfs/{pdf_path}.pdf")
+    result = keyword_finder.find_keywords_with_context(pagenumber)
+    keyword_finder.close()
+    listofnames=result               
+
+    pdf_processor = PDFProcessor()
+    pdf_processor.process_pdf(pdf_path=pdf_path, target_page=pagenumber, names=listofnames)
+    pdf_processor.save_results_to_csv(output_csv_path='output_results.csv')
+    pdf_processor.display_results()
