@@ -51,7 +51,7 @@ class PDF_wrapper:
         """Get the list of candidate_pages in the PDF."""
         return self._pages
 
-    def add_page(self, page_number:int, selectable:bool, scanned:bool, has_1a_table:bool, csv_path:str,csv_method:str,tables:list[pd.DataFrame]):
+    def add_page(self, page_number:int, selectable:bool, scanned:bool, has_1a_table:bool, csv_path:str,csv_method:str,tables:list[pd.DataFrame]) -> None:
         """
         Add a new candidate page to the PDF.
 
