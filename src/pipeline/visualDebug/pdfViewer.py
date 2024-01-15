@@ -68,6 +68,7 @@ class PDFViewer:
         
     
     def toggle_view(self):
+        """swaps between the view of pdfs with extracted tables and pdfs without them"""
         if self.current_display == "tree":
             self.tree.pack_forget()
             self.no_wnt_list.pack(side= "bottom",fill=tk.BOTH, expand=True)
@@ -87,21 +88,24 @@ class PDFViewer:
         self.switch_button.grid(row = 0, column = 2)
         
     def approve_selected(self):
+        """approve the current tables as correct and delete them from the treeview"""
         selected_items = self.tree.selection()
         for item in selected_items:
             self.tree.delete(item)
 
     def approve_all(self):
+        """approve all tables as correct and delete them from the treeview"""
         self.tree.delete(*self.tree.get_children())
     
     def load_wrapper(self, wrapperlist):
-        """Load all the pdf's that are in the wrapper list."""
+        """Load all the pdf's in the wrapper list and put the pages in the treeview."""
         for pdfwrap in wrapperlist:
             for page in pdfwrap.pages:
                 if page.has_1a_table:
                     self.tree.insert('', 'end', values=(page.pdf_path, page.page_number, page.csv_path, page.csv_method))
 
     def no_wnt_pdf(self):
+        """Create a listbox that contains all pdfs from which no tables were extracted"""
         no_csv_pdfs = []
         for pdfwrap in self.wrapperlist:
             wnt_found = False
@@ -122,13 +126,14 @@ class PDFViewer:
         return lb1
 
     def select_no_wnt(self,evt):
+        """Displays the pdf that was selected from the no_wnt listbox"""
         w = evt.widget
         index = int(w.curselection()[0])
         value = w.get(index)
         new_window = tk.Toplevel()
         new_window.title(os.path.basename(value))
         new_window.geometry("600x800")
-        self.display_pdf(value,0,new_window)
+        self.display_pdf(value,1,new_window)
         
         
         
@@ -186,10 +191,12 @@ class PDFViewer:
 
         def check_buttons():
             prev_button['state'] = tk.NORMAL if self.current_page_number > 0 else tk.DISABLED
-            next_button['state'] = tk.NORMAL if self.current_page_number < pdf.page_count - 1 else tk.DISABLED
+            next_button['state'] = tk.NORMAL if self.current_page_number < pdf.page_count - 2 else tk.DISABLED
         check_buttons()
         
     def display_table(self,csv_path,window,pdf_name):
+        """displays the table that was extracted for each pdf with functionality for saving, undoing and
+        editing the table"""
         f = tk.Frame(window, width=650, height=800)
         f.pack(side = "right", fill="none", expand=True)
         self.file_name_original_csv = csv_path
@@ -221,6 +228,8 @@ class PDFViewer:
         
     
     def undo_changes(self):
+        """"changes the edits you made to the table back to what they were when the window originally opened. This
+        saves the table as well, putting the csv back to its original state."""
         response = messagebox.askyesno("Confirm Undo", "Are you sure you want to undo all changes?",parent = self.window)
         if response:
             self.df = self.df_backup.copy()
@@ -243,6 +252,8 @@ class PDFViewer:
         
 
     def create_new_1a(self, csv_path, target_folder, file_name):
+        """unused method currently. Creates a new copy of the file. Might have some functionality
+        for creating tables from scratch"""
         workbook = openpyxl.load_workbook(csv_path)
 
         target_path = os.path.join(target_folder, file_name)
@@ -256,6 +267,7 @@ class PDFViewer:
         workbook.save(target_path)
 
     def add_column(self):
+        """"add a column following the wnt template format"""
         template_excel_column = 'src/pipeline/visualDebug/1a_template.xlsx'
         template_column = pd.read_excel(template_excel_column, usecols=['Persoon 1']).squeeze()
 
@@ -288,15 +300,7 @@ class PDFViewer:
         self.display_pdf(pdf_name, page - 1, new_window)
         self.display_table(csv_file, new_window,pdf_name)
         
-        
-
-    def approve_and_close(self, window, item):
-        # Close the PDF + table window
-        window.destroy()
-
-        # Remove the item from the list in the main window
-        self.tree.delete(item)
- 
+    
     def run(self):
         """Start the GUI loop."""
         self.root.mainloop()
