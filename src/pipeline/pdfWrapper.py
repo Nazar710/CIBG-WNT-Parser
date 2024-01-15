@@ -49,7 +49,7 @@ class PDF_wrapper:
         """Get the list of candidate_pages in the PDF."""
         return self._pages
 
-    def add_page(self, page_number, selectable, scanned, has_1a_table, csv_path):
+    def add_page(self, page_number, selectable, scanned, has_1a_table, csv_path,csv_method):
         """
         Add a new candidate page to the PDF.
 
@@ -60,7 +60,7 @@ class PDF_wrapper:
             has_1a_table (bool): True if the page contains a 1a table, False otherwise.
             csv_path (str): The file path to the CSV representation of the page.
         """
-        new_page = self.candidate_pages(self, page_number, selectable, scanned, has_1a_table, csv_path,self.file_path)
+        new_page = self.candidate_pages(self, page_number, selectable, scanned, has_1a_table, csv_path,self.file_path,csv_method)
         self._pages.append(new_page)
 
     class candidate_pages:

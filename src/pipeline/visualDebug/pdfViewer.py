@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import fitz 
 import datetime
-from tkinter import Canvas, Scrollbar, ttk
+from tkinter import Canvas, Scrollbar, ttk, messagebox
 from PIL import Image, ImageTk
 import os, sys
 import pandas as pd
@@ -16,12 +16,14 @@ class PDFViewer:
 
     def __init__(self, wrapperlist):
         self.root = TkinterDnD.Tk()
-        self.root.title('extracted tables')
-        self.wrapperList = wrapperlist
-        self.root.geometry("600x800")
+        self.root.title('')
+        self.wrapperlist = wrapperlist
+        width= self.root.winfo_screenwidth() 
+        height= self.root.winfo_screenheight()
+        self.root.geometry("%dx%d" % (width, height))
         # Create the Treeview
+        
         self.tree = ttk.Treeview(self.root)
-
         # Define columns
         self.tree['columns'] = ('file_name', 'page_number', 'csv_file', 'status')
 
@@ -42,17 +44,99 @@ class PDFViewer:
         self.load_wrapper(wrapperlist)
 
         # Bind the select event
-        self.tree.bind('<<TreeviewSelect>>', self.on_pdf_select)
+        self.tree.bind('<Double-1>', self.on_pdf_select)
 
-        self.tree.pack(fill=tk.BOTH, expand=True)
+        self.tree.pack(side= "bottom",fill=tk.BOTH, expand=True)
+        
+        self.no_wnt_list = self.no_wnt_pdf()
+        
+        self.current_display = "tree"
+        
+        #add approve buttons
+        approve_buttons = tk.Frame(self.root)
+        
+        self.approve_button = tk.Button(approve_buttons, text="Approve", command=self.approve_selected)
+        self.approve_button.grid(row = 0, column = 0, sticky = 'w')
+        
+        self.approve_all_button = tk.Button(approve_buttons, text="Approve All", command=self.approve_all)
+        self.approve_all_button.grid(row = 0, column = 4, sticky = 'e')
+        
+        self.switch_button = tk.Button(approve_buttons, text="files without 1a table found", command=self.toggle_view)
+        self.switch_button.grid(row = 0, column = 2)
+        
+        approve_buttons.pack(side = "top")
+        
+    
+    def toggle_view(self):
+        """swaps between the view of pdfs with extracted tables and pdfs without them"""
+        if self.current_display == "tree":
+            self.tree.pack_forget()
+            self.no_wnt_list.pack(side= "bottom",fill=tk.BOTH, expand=True)
+            self.current_display = "no_wnt"
+            self.switch_button.configure(text = "go back")
+            self.approve_button.grid_forget()
+            self.approve_all_button.grid_forget()
+            
+        else:
+            self.no_wnt_list.pack_forget()
+            self.tree.pack(side= "bottom",fill=tk.BOTH, expand=True)
+            self.current_display = "tree"
+            self.switch_button.configure(text = "files without 1a table found")
+            self.approve_button.grid(row = 0, column = 0, sticky = 'w')
+            self.approve_all_button.grid(row = 0, column = 4, sticky = 'e')
+            
+        self.switch_button.grid(row = 0, column = 2)
+        
+    def approve_selected(self):
+        """approve the current tables as correct and delete them from the treeview"""
+        selected_items = self.tree.selection()
+        for item in selected_items:
+            self.tree.delete(item)
 
+    def approve_all(self):
+        """approve all tables as correct and delete them from the treeview"""
+        self.tree.delete(*self.tree.get_children())
+    
     def load_wrapper(self, wrapperlist):
-        """Load all the pdf's that are in the wrapper list."""
+        """Load all the pdf's in the wrapper list and put the pages in the treeview."""
         for pdfwrap in wrapperlist:
             for page in pdfwrap.pages:
                 if page.has_1a_table:
-                    self.tree.insert('', 'end', values=(page.pdf_path, page.page_number, page.csv_path, "certain"))
+                    self.tree.insert('', 'end', values=(page.pdf_path, page.page_number, page.csv_path, page.csv_method))
 
+    def no_wnt_pdf(self):
+        """Create a listbox that contains all pdfs from which no tables were extracted"""
+        no_csv_pdfs = []
+        for pdfwrap in self.wrapperlist:
+            wnt_found = False
+            for page in pdfwrap.pages:
+                if page.has_1a_table:
+                    wnt_found = True
+            if not wnt_found:
+                no_csv_pdfs.append(pdfwrap)
+                
+        if len(no_csv_pdfs) > 0:
+            lb1 = tk.Listbox(self.root)
+            for pdf in no_csv_pdfs:
+                lb1.insert('end',pdf.file_path)
+                lb1.bind('<<ListboxSelect>>',self.select_no_wnt)
+                
+        else:
+            lb1 = tk.Label(self.root,text="All PDF's have tables that were extracted")
+        return lb1
+
+    def select_no_wnt(self,evt):
+        """Displays the pdf that was selected from the no_wnt listbox"""
+        w = evt.widget
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        new_window = tk.Toplevel()
+        new_window.title(os.path.basename(value))
+        new_window.geometry("600x800")
+        self.display_pdf(value,1,new_window)
+        
+        
+        
     def display_pdf(self, pdf_path, target_page, new_window):
         """Open a PDF file in a new window with navigation buttons, zoom functionality, and scrollbars."""
         f = tk.Frame(new_window)
@@ -107,33 +191,70 @@ class PDFViewer:
 
         def check_buttons():
             prev_button['state'] = tk.NORMAL if self.current_page_number > 0 else tk.DISABLED
-            next_button['state'] = tk.NORMAL if self.current_page_number < pdf.page_count - 1 else tk.DISABLED
+            next_button['state'] = tk.NORMAL if self.current_page_number < pdf.page_count - 2 else tk.DISABLED
         check_buttons()
         
-    def display_table(self,csv_path,window):
+    def display_table(self,csv_path,window,pdf_name):
+        """displays the table that was extracted for each pdf with functionality for saving, undoing and
+        editing the table"""
         f = tk.Frame(window, width=650, height=800)
         f.pack(side = "right", fill="none", expand=True)
-        self.file_name_original_pdf = '1a_test.xlsx'
-        self.create_new_1a(file_name=self.file_name_original_pdf)
-        # Load the dataframe and set it as an instance attribute
-        self.df = pd.read_excel(self.file_name_original_pdf)
-
+        self.file_name_original_csv = csv_path
+        self.window = window
+        # just for testing: check if the csv is in excel format and handle it as excel, otherwise as csv
+        if ".xlsx" in csv_path:
+            self.df = pd.read_excel(self.file_name_original_csv)
+        else:
+            self.df = pd.read_csv(self.file_name_original_csv)
+        
+        # Create a backup of the DataFrame
+        self.df_backup = self.df.copy() 
+        
         self.table = Table(f, dataframe=self.df, showtoolbar=True, showstatusbar=True, maxcellwidth=200, height = 600, width = 2000)
         self.table.show()
+        
         buttons = tk.Frame(f)
         self.add_column_button = tk.Button(buttons, text='Add Column', command=self.add_column)
         self.add_column_button.pack()
 
-        self.save_file_button = tk.Button(buttons, text='Save WNT edits', command=self.save_changes)
+        self.save_file_button = tk.Button(buttons, text='Save changes', command=self.save_changes)
         self.save_file_button.pack()
+        
+        self.undo_button = tk.Button(buttons, text='Undo Changes', command=self.undo_changes)
+        self.undo_button.pack()
+        buttons.grid(row=0, column=0)
+        
         buttons.grid(row = 0, column = 0)
         
-    def save_changes(self):
-        self.df.to_excel(self.file_name_original_pdf, index=False)
-        print("Changes saved to Excel!")
+    
+    def undo_changes(self):
+        """"changes the edits you made to the table back to what they were when the window originally opened. This
+        saves the table as well, putting the csv back to its original state."""
+        response = messagebox.askyesno("Confirm Undo", "Are you sure you want to undo all changes?",parent = self.window)
+        if response:
+            self.df = self.df_backup.copy()
+            self.table.model.df = self.df
+            self.table.redraw()
+            self.save_changes(False)
+        
+        
+    def save_changes(self, show_popup: bool = True):
+        if ".xlsx" in self.file_name_original_csv:
+            self.df.to_excel(self.file_name_original_csv, index=False)
+        else:
+            self.df.to_csv(self.file_name_original_csv, index = False)
+        if show_popup: 
+            popup = tk.Toplevel(self.window)
+            popup.title("Save Confirmation")
+            label = tk.Label(popup, text="changes saved")
+            label.pack()
+            popup.after(1000, popup.destroy)
+        
 
-    def create_new_1a(self, src: str = 'src/pipeline/visualDebug/1a_template.xlsx', target_folder: str = '', file_name: str = '1a_test.xlsx'):
-        workbook = openpyxl.load_workbook(src)
+    def create_new_1a(self, csv_path, target_folder, file_name):
+        """unused method currently. Creates a new copy of the file. Might have some functionality
+        for creating tables from scratch"""
+        workbook = openpyxl.load_workbook(csv_path)
 
         target_path = os.path.join(target_folder, file_name)
 
@@ -146,12 +267,13 @@ class PDFViewer:
         workbook.save(target_path)
 
     def add_column(self):
+        """"add a column following the wnt template format"""
         template_excel_column = 'src/pipeline/visualDebug/1a_template.xlsx'
-        template_column = pd.read_excel(template_excel_column, usecols=['Persoon 1'])
+        template_column = pd.read_excel(template_excel_column, usecols=['Persoon 1']).squeeze()
 
         # Ensure the new column length matches the DataFrame's length
         while len(template_column) < len(self.df):
-            template_column = template_column.append(pd.Series([None]), ignore_index=True)
+            template_column = pd.concat([template_column,pd.Series([None])], ignore_index=True)
         template_column = template_column[:len(self.df)]
 
         col_name = f"Persoon {len(self.df.columns)}"
@@ -166,7 +288,7 @@ class PDFViewer:
         """Handle the selection of a PDF file from the Treeview."""
         w = event.widget
         selected_item = w.selection()[0]  # Get selected item
-        pdf_name, page_str, csv_file, status = w.item(selected_item, 'values')
+        pdf_name, page_str, csv_file, csv_method = w.item(selected_item, 'values')
         page = int(page_str)
 
         # Create a new window to display the PDF
@@ -176,9 +298,9 @@ class PDFViewer:
 
         # Display the PDF and the table in the new window
         self.display_pdf(pdf_name, page - 1, new_window)
-        self.display_table('src/pipeline/visualDebug/1a_template.xlsx', new_window)
-
- 
+        self.display_table(csv_file, new_window,pdf_name)
+        
+    
     def run(self):
         """Start the GUI loop."""
         self.root.mainloop()
@@ -187,7 +309,13 @@ class PDFViewer:
 # pdf_files = [f for f in os.listdir(folder_path) if f.endswith('.pdf')]
 wrappers = []
 wrapper1 = PDF_wrapper("wnt_not_scanned","src\pipeline\wnt_not_scanned.pdf")
-wrapper1.add_page(35,True,False,True,"src/pipeline/visualDebug/1a_template.xlsx")
+wrapper1.add_page(35,True,False,True,'src\pipeline\speedy_candidates_results.csv', "exact match coördinate")
 wrappers.append(wrapper1)
+wrapper2 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
+wrapper2.add_page(34,False,True,True,"src/pipeline/visualDebug/1a_template.xlsx", "ocr")
+wrappers.append(wrapper2)
+wrapper3 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
+wrapper3.add_page(20,True,True,False,"","Mathias")
+wrappers.append(wrapper3)
 viewer = PDFViewer(wrappers)
 viewer.run()
