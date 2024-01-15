@@ -65,7 +65,7 @@ class PDF_wrapper:
             csv_path (str): The file path to the CSV representation of the page.
         
         """
-        new_page = self.candidate_pages(self, page_number, selectable, scanned, has_1a_table, csv_path,self.file_path,csv_method)
+        new_page = self.candidate_pages(self, page_number, selectable, scanned, has_1a_table, csv_path,self.file_path,csv_method, tables)
         self._pages.append(new_page)
 
     def num_page_iterator(self) -> Generator:
@@ -122,7 +122,7 @@ class PDF_wrapper:
 
         """
 
-        def __init__(self, parent_pdf, page_number, selectable, scanned, has_1a_table, csv_path, pdf_path, csv_method):
+        def __init__(self, parent_pdf, page_number, selectable, scanned, has_1a_table, csv_path, pdf_path, csv_method, tables):
             """
             Constructs all the necessary attributes for the candidate_pages object.
 
@@ -142,8 +142,11 @@ class PDF_wrapper:
             self._has_1a_table = has_1a_table
             self._csv_path = csv_path
             self._pdf_path = pdf_path
+            self._tables = tables
 
-
+        @property
+        def tables(self):
+            return self.tables
         @property
         def pdf_path(self):
             """get or set the pdf path of the file in which the page is located"""

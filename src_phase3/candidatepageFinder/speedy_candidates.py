@@ -19,7 +19,7 @@ class candidates():
             text = textpage.get_text_range()
             
             if(self.isCandidate(text)):
-                candidate_pages.append(page_num)
+                candidate_pages.append(page_num+1)
 
         return candidate_pages
     
@@ -35,7 +35,7 @@ class candidates():
             text = textpage.get_text_range()
             
             if(len(text) ==0):
-                ocrNEEDEDPAGES.append(page_num)
+                ocrNEEDEDPAGES.append(page_num+1)
         return ocrNEEDEDPAGES
 
     def isCandidate(self,page:str) -> bool:

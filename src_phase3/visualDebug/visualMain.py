@@ -174,6 +174,7 @@ class PDFProcessorApp:
         path_list = []
         for pdf_path in self.listbox.get(0, "end"):
             path_list.append(pdf_path)
+        return path_list
             
     def create_entry_bars(self):
         output_folder_frame = tk.Frame(self.root)
