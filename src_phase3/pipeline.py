@@ -31,12 +31,16 @@ if __name__ == "__main__":
     tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
     hidden_progress_bar = True
 
+
+
     #pipeline
+    pdf_path_list = ["./pdfs/1aTable.pdf"]
+    
+    
     Extractor = a1checkerMain.extractor()
     checker = a1checkerMain.a1checker()
 
-    wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extract("pdfs")]
-
+    wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
 
     for wrappedPDF in wrappedPdfs:
         pdf_path = wrappedPDF.file_path
@@ -50,12 +54,8 @@ if __name__ == "__main__":
             
             if(isExactMatch):
                 wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="",tables=exact_match_table)
-                
-
             else: #not exact match 
                 whiteSpace(pdf_path,pagenumber,wrappedPDF)
-
-
 
         if(not wrappedPDF.has1ATable):
             
@@ -70,3 +70,5 @@ if __name__ == "__main__":
                 searchable_pdf_page_output_path = f'tempSearchable.pdf'
                 searchable_pdf_page.save(searchable_pdf_page_output_path)
                 whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF)
+
+    
