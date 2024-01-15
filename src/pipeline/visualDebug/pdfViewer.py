@@ -16,7 +16,7 @@ class PDFViewer:
 
     def __init__(self, wrapperlist):
         self.root = TkinterDnD.Tk()
-        self.root.title('extracted tables')
+        self.root.title('')
         self.wrapperlist = wrapperlist
         width= self.root.winfo_screenwidth() 
         height= self.root.winfo_screenheight()
@@ -72,7 +72,7 @@ class PDFViewer:
             self.tree.pack_forget()
             self.no_wnt_list.pack(side= "bottom",fill=tk.BOTH, expand=True)
             self.current_display = "no_wnt"
-            self.switch_button.configure(text = "files where a table was extracted")
+            self.switch_button.configure(text = "go back")
             self.approve_button.grid_forget()
             self.approve_all_button.grid_forget()
             
@@ -92,7 +92,7 @@ class PDFViewer:
             self.tree.delete(item)
 
     def approve_all(self):
-        self.root.destroy()
+        self.tree.delete(*self.tree.get_children())
     
     def load_wrapper(self, wrapperlist):
         """Load all the pdf's that are in the wrapper list."""
@@ -129,6 +129,7 @@ class PDFViewer:
         new_window.title(os.path.basename(value))
         new_window.geometry("600x800")
         self.display_pdf(value,0,new_window)
+        
         
         
     def display_pdf(self, pdf_path, target_page, new_window):
