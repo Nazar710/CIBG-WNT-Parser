@@ -6,6 +6,10 @@ import whiteSpace.scannedConvert as scannedConvert
 import whiteSpace.exactmatch_whitespace as exactmatch_whitespace
 import candidatepageFinder.speedy_candidates as speedy_candidates
 from tqdm import tqdm
+from visualDebug.visualMain import PDFProcessorApp
+from tkinterdnd2 import DND_FILES, TkinterDnD
+
+
 
 def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     #whitespace tables
@@ -21,22 +25,16 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     if(len(tables) > 0):
         #only adds page if it's 1a
         wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="",tables=tables)
-            
 
-if __name__ == "__main__":
+
+def pipeline(pdf_path_list:list[str]):
     #hyper param
     treshold = 0.7 
     keywords = ["bezoldiging", "wnt"]
     minNumRowsMatched = 10
     tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
     hidden_progress_bar = True
-
-
-
-    #pipeline
-    pdf_path_list = ["./pdfs/1aTable.pdf"]
-    
-    
+        
     Extractor = a1checkerMain.extractor()
     checker = a1checkerMain.a1checker()
 
@@ -71,4 +69,7 @@ if __name__ == "__main__":
                 searchable_pdf_page.save(searchable_pdf_page_output_path)
                 whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF)
 
-    
+if __name__ == "__main__":
+    root = TkinterDnD.Tk()
+    app = PDFProcessorApp(root,pipeline)
+    root.mainloop()
