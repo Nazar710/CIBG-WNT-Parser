@@ -31,11 +31,16 @@ if __name__ == "__main__":
     tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
     hidden_progress_bar = True
 
+
+
     #pipeline
+    pdf_path_list = ["./pdfs/1aTable.pdf"]
+    
+    
     Extractor = a1checkerMain.extractor()
     checker = a1checkerMain.a1checker()
 
-    wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extract("pdfs")]
+    wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
 
     for wrappedPDF in wrappedPdfs:
         pdf_path = wrappedPDF.file_path

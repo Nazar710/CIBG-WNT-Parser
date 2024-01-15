@@ -72,7 +72,8 @@ class extractor():
             tableswithnums = self.extract_table(path)
             pdf_obj = pdf(path,file_name,tableswithnums)
             pdfsobj_list.append(pdf_obj)
-
+            
+        return pdfsobj_list
 
     @staticmethod 
     def recursiveFilePathIterator(folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> Generator:
