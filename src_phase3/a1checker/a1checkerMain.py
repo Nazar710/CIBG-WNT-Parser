@@ -64,6 +64,16 @@ class extractor():
             
         return pdfsobj_list
 
+    def extractFromPathList(self,paths:list[str]):
+        pdfsobj_list = []
+
+        for path in paths:
+            file_name = os.path.basename(path)
+            tableswithnums = self.extract_table(path)
+            pdf_obj = pdf(path,file_name,tableswithnums)
+            pdfsobj_list.append(pdf_obj)
+
+
     @staticmethod 
     def recursiveFilePathIterator(folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> Generator:
         """
