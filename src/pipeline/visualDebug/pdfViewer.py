@@ -17,13 +17,13 @@ class PDFViewer:
     def __init__(self, wrapperlist):
         self.root = TkinterDnD.Tk()
         self.root.title('extracted tables')
-        self.wrapperList = wrapperlist
+        self.wrapperlist = wrapperlist
         width= self.root.winfo_screenwidth() 
         height= self.root.winfo_screenheight()
         self.root.geometry("%dx%d" % (width, height))
         # Create the Treeview
+        
         self.tree = ttk.Treeview(self.root)
-
         # Define columns
         self.tree['columns'] = ('file_name', 'page_number', 'csv_file', 'status')
 
@@ -47,16 +47,44 @@ class PDFViewer:
         self.tree.bind('<Double-1>', self.on_pdf_select)
 
         self.tree.pack(side= "bottom",fill=tk.BOTH, expand=True)
+        
+        self.no_wnt_list = self.no_wnt_pdf()
+        
+        self.current_display = "tree"
+        
         #add approve buttons
         approve_buttons = tk.Frame(self.root)
         
-        approve_button = tk.Button(approve_buttons, text="Approve", command=self.approve_selected)
-        approve_button.pack(side="left")
+        self.approve_button = tk.Button(approve_buttons, text="Approve", command=self.approve_selected)
+        self.approve_button.grid(row = 0, column = 0, sticky = 'w')
         
-        approve_all_button = tk.Button(approve_buttons, text="Approve All", command=self.approve_all)
-        approve_all_button.pack(side = "right")
+        self.approve_all_button = tk.Button(approve_buttons, text="Approve All", command=self.approve_all)
+        self.approve_all_button.grid(row = 0, column = 4, sticky = 'e')
+        
+        self.switch_button = tk.Button(approve_buttons, text="files without 1a table found", command=self.toggle_view)
+        self.switch_button.grid(row = 0, column = 2)
         
         approve_buttons.pack(side = "top")
+        
+    
+    def toggle_view(self):
+        if self.current_display == "tree":
+            self.tree.pack_forget()
+            self.no_wnt_list.pack(side= "bottom",fill=tk.BOTH, expand=True)
+            self.current_display = "no_wnt"
+            self.switch_button.configure(text = "files where a table was extracted")
+            self.approve_button.grid_forget()
+            self.approve_all_button.grid_forget()
+            
+        else:
+            self.no_wnt_list.pack_forget()
+            self.tree.pack(side= "bottom",fill=tk.BOTH, expand=True)
+            self.current_display = "tree"
+            self.switch_button.configure(text = "files without 1a table found")
+            self.approve_button.grid(row = 0, column = 0, sticky = 'w')
+            self.approve_all_button.grid(row = 0, column = 4, sticky = 'e')
+            
+        self.switch_button.grid(row = 0, column = 2)
         
     def approve_selected(self):
         selected_items = self.tree.selection()
@@ -73,6 +101,36 @@ class PDFViewer:
                 if page.has_1a_table:
                     self.tree.insert('', 'end', values=(page.pdf_path, page.page_number, page.csv_path, page.csv_method))
 
+    def no_wnt_pdf(self):
+        no_csv_pdfs = []
+        for pdfwrap in self.wrapperlist:
+            wnt_found = False
+            for page in pdfwrap.pages:
+                if page.has_1a_table:
+                    wnt_found = True
+            if not wnt_found:
+                no_csv_pdfs.append(pdfwrap)
+                
+        if len(no_csv_pdfs) > 0:
+            lb1 = tk.Listbox(self.root)
+            for pdf in no_csv_pdfs:
+                lb1.insert('end',pdf.file_path)
+                lb1.bind('<<ListboxSelect>>',self.select_no_wnt)
+                
+        else:
+            lb1 = tk.Label(self.root,text="All PDF's have tables that were extracted")
+        return lb1
+
+    def select_no_wnt(self,evt):
+        w = evt.widget
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        new_window = tk.Toplevel()
+        new_window.title(os.path.basename(value))
+        new_window.geometry("600x800")
+        self.display_pdf(value,0,new_window)
+        
+        
     def display_pdf(self, pdf_path, target_page, new_window):
         """Open a PDF file in a new window with navigation buttons, zoom functionality, and scrollbars."""
         f = tk.Frame(new_window)
@@ -251,5 +309,8 @@ wrappers.append(wrapper1)
 wrapper2 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
 wrapper2.add_page(34,False,True,True,"src/pipeline/visualDebug/1a_template.xlsx", "ocr")
 wrappers.append(wrapper2)
+wrapper3 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
+wrapper3.add_page(20,True,True,False,"","Mathias")
+wrappers.append(wrapper3)
 viewer = PDFViewer(wrappers)
 viewer.run()
