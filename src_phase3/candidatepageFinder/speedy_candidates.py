@@ -22,6 +22,21 @@ class candidates():
                 candidate_pages.append(page_num)
 
         return candidate_pages
+    
+    def needsOCR(self,pdf_path:str,hide_progress_bar:bool=False) -> list[int]:
+        pdf = pdfium.PdfDocument(pdf_path)
+
+        ocrNEEDEDPAGES = []
+        for page_num,page in tqdm(enumerate(pdf),ascii=True,desc="find_OCR_required_pages",disable=hide_progress_bar):
+            # Load a text page helper
+            textpage = page.get_textpage()
+
+            # Extract text from the whole page 
+            text = textpage.get_text_range()
+            
+            if(len(text) ==0):
+                ocrNEEDEDPAGES.append(page_num)
+        return ocrNEEDEDPAGES
 
     def isCandidate(self,page:str) -> bool:
         text = page.lower()

@@ -3,6 +3,7 @@ from pdf2image import convert_from_path
 import pytesseract
 from PIL import Image
 import os
+import sys
 
 class SearchablePDFConverter:
     def __init__(self, input_pdf_path, tesseract_cmd_path):
@@ -10,11 +11,15 @@ class SearchablePDFConverter:
         self.tesseract_cmd_path = tesseract_cmd_path
 
     def validate_paths(self):
-        if not os.path.isfile(self.input_pdf_path):
-            raise FileNotFoundError(f"Input PDF not found at: {self.input_pdf_path}")
+        if(sys.platform.startswith("linux")):
+            pass 
+        else:
 
-        if not os.path.isfile(self.tesseract_cmd_path):
-            raise FileNotFoundError(f"Tesseract executable not found at: {self.tesseract_cmd_path}")
+            if not os.path.isfile(self.input_pdf_path):
+                raise FileNotFoundError(f"Input PDF not found at: {self.input_pdf_path}")
+
+            if not os.path.isfile(self.tesseract_cmd_path):
+                raise FileNotFoundError(f"Tesseract executable not found at: {self.tesseract_cmd_path}")
 
     def post_process_text(self, ocr_data, x_threshold=5, y_threshold=5):
         grouped_text = []
@@ -34,7 +39,9 @@ class SearchablePDFConverter:
         return grouped_text
 
     def convert_to_searchable_pdf(self, font_size=25, x_threshold=200, y_threshold=200):
-        pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd_path
+        
+        if(sys.platform.startswith('linux')):
+            pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd_path
         self.validate_paths()
 
         # Step 1: Convert each page of the scanned PDF to images
@@ -61,7 +68,10 @@ class SearchablePDFConverter:
         return pdf_writer
 
     def convert_to_searchable_pdf_page(self, page_number, font_size=5, x_threshold=150, y_threshold=10):
-        pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd_path
+        if(sys.platform.startswith("linux")):
+            pass 
+        else:
+            pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd_path
         self.validate_paths()
 
         # Step 1: Convert the specified page of the scanned PDF to an image
@@ -84,7 +94,7 @@ class SearchablePDFConverter:
             pdf_page.insert_text((x, y), text, fontsize=font_size)
 
         # Return the final searchable PDF for the specified page
-        return pdf_writer
+        return pdf_writer 
 
 
 if __name__ == "__main__":
@@ -106,3 +116,4 @@ if __name__ == "__main__":
     # Save the output searchable PDF for the specific page to a file
     searchable_pdf_page_output_path = f'tempSearchable.pdf'
     searchable_pdf_page.save(searchable_pdf_page_output_path)
+

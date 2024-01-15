@@ -145,7 +145,7 @@ class a1checker():
         return [pos for pos in positions]
     
     
-    def is1aOrNot(self,pdfObj:pdf,threshold:float,minNumRowsMatched:int=10,pdf_folder_name:str="pdfs",method_name:str="") -> PDF_wrapper:
+    def is1aOrNot(self,pdfObj:pdf,threshold:float,minNumRowsMatched:int=10,method_name:str="") -> PDF_wrapper:
         file_name = pdfObj.file_name
         path = pdfObj.path
         wrappedPDFobj  = PDF_wrapper(file_name,path)
