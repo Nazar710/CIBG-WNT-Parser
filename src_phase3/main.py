@@ -49,7 +49,7 @@ class extractor():
 
         for path,file_name in extractor.recursiveFilePathIterator(folder_name,accepted_formats):
             tableswithnums = self.extract_table(path)
-            pdf_obj = pdf(file_name,path,tableswithnums)
+            pdf_obj = pdf(path,file_name,tableswithnums)
             pdfsobj_list.append(pdf_obj)
             
         return pdfsobj_list
@@ -133,51 +133,25 @@ class a1checker():
         positions = np.concatenate((np.expand_dims(x,axis=1),np.expand_dims(y,axis=1)),axis=1)
         
         return [pos for pos in positions]
-
-    def is1aOrNotFolder(self, threshold:float,extractObj:extractor,pdf_folder_name:str="pdfs") -> None:
-        default_list = [False] * 13 #rows from A1 table
-        print(default_list)
-        index = 0
-        for datapoint in self.data_points:
-            print(datapoint)
-            standardTables = []
-            for pdf_obj in extractObj.extract(pdf_folder_name):
-                for table in pdf_obj.tables[0]:
-                    # print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
-                    print(self.findFuzzyMatchInTable(table, datapoint, threshold))
-                    isStandard = True
-                    if (len(self.findFuzzyMatchInTable(table, datapoint, threshold)) == 0):
-                        isStandard = False
-                        break
-                    else:
-                        default_list[index] = True
-                        print("datapoint: ", datapoint)
-                    if (isStandard):
-                        standardTables.append((pdf_obj, table))
-            index += 1
-        print(default_list)
-        count_true = default_list.count(True)
-        if count_true >=10:
-            print("Found ", count_true, "datapoints.", "this is 1a Table")
-        else:
-            print("Found ", count_true, "datapoints", "Not 1a Table")
-
     
     
-    def is1aOrNot(self,pdfObj:pdf,threshold:float,pdf_folder_name:str="pdfs") -> list[int]:
-        default_list = [False] * 13 #rows from A1 table
+    def is1aOrNot(self,pdfObj:pdf,threshold:float,minNumRowsMatched:int=10,pdf_folder_name:str="pdfs",method_name:str="") -> PDF_wrapper:
         
-        pageNumsWithA1Table = []
+        file_name = pdfObj.file_name
+        path = pdfObj.path
+        wrappedPDFobj  = PDF_wrapper(file_name,path)
 
         for table,pagenum in pdfObj.tables:
-            print(pagenum)
-        
-        
-
-        #     for index,datapoint in enumerate(checker.data_points):   
-            
-
-         
+            match_count = np.array([len(self.findFuzzyMatchInTable(table, datapoint, threshold)) > 0 for datapoint in self.data_points]).sum()
+            if(match_count >= minNumRowsMatched):
+                #has a1
+                wrappedPDFobj.add_page(page_number=pagenum,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method=method_name,tables=table)
+            else:
+                #has not a1
+                wrappedPDFobj.add_page(page_number=pagenum,selectable=True,scanned=False,has_1a_table=False,csv_path="",csv_method=method_name,tables=table)
+                    
+        #check what pages are selectable
+        return wrappedPDFobj
 
 
 
@@ -191,4 +165,5 @@ if __name__ == "__main__":
 
     for pdfobj in Extractor.extract("pdfs"):
         checker.is1aOrNot(pdfobj,treshold)
-        
+
+         

@@ -1,3 +1,4 @@
+import pandas as pd 
 """
 wrapper class for PDF file and its candidate pages
 author: john nazarenko 
@@ -21,7 +22,7 @@ class PDF_wrapper:
         file_path: get or set the path to the PDF file.
     """
 
-    def __init__(self, file_name, file_path):
+    def __init__(self, file_name:str, file_path:str) -> None:
         """
         Constructs all the necessary attributes for the PDF_wrapper object.
 
@@ -33,23 +34,24 @@ class PDF_wrapper:
         self._pages = []
 
     @property
-    def file_path(self):
+    def file_path(self) -> str:
         return self._file_path
+    
     @property
-    def file_name(self):
+    def file_name(self) -> str:
         """Get or set the file name of the PDF."""
         return self._file_name
 
     @file_name.setter
-    def file_name(self, value):
+    def file_name(self, value:str) -> None:
         self._file_name = value
 
     @property
-    def pages(self):
+    def pages(self) -> list:
         """Get the list of candidate_pages in the PDF."""
         return self._pages
 
-    def add_page(self, page_number, selectable, scanned, has_1a_table, csv_path,csv_method):
+    def add_page(self, page_number:int, selectable:bool, scanned:bool, has_1a_table:bool, csv_path:str,csv_method:str,tables:list[pd.DataFrame]):
         """
         Add a new candidate page to the PDF.
 
@@ -59,6 +61,7 @@ class PDF_wrapper:
             scanned (bool): True if the page is scanned, False otherwise.
             has_1a_table (bool): True if the page contains a 1a table, False otherwise.
             csv_path (str): The file path to the CSV representation of the page.
+        
         """
         new_page = self.candidate_pages(self, page_number, selectable, scanned, has_1a_table, csv_path,self.file_path,csv_method)
         self._pages.append(new_page)
@@ -97,7 +100,7 @@ class PDF_wrapper:
                 selectable (bool): True if the page content is selectable, False otherwise.
                 scanned (bool): True if the page is scanned, False otherwise.
                 has_1a_table (bool): True if the page contains a 1a table, False otherwise.
-                csv_path (str): The file path to the CSV representation of the page.
+                csv_path (str): The file path to the CSV representation of the table.
             """
             self._csv_method = csv_method
             self.parent_pdf = parent_pdf
@@ -115,7 +118,7 @@ class PDF_wrapper:
             return self._pdf_path
         @property
         def csv_method(self):
-            """get or set the method that constructed the csv representation of this page"""
+            """get or set the method that constructed the csv representation of this table"""
             return self._csv_method
 
         @property
