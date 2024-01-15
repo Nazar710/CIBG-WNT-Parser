@@ -1,4 +1,6 @@
 import pandas as pd 
+import pdfplumber
+from typing import Generator
 """
 wrapper class for PDF file and its candidate pages
 author: john nazarenko 
@@ -65,6 +67,36 @@ class PDF_wrapper:
         """
         new_page = self.candidate_pages(self, page_number, selectable, scanned, has_1a_table, csv_path,self.file_path,csv_method)
         self._pages.append(new_page)
+
+    def num_page_iterator(self) -> Generator:
+        with pdfplumber.open(self._file_path) as pdf:
+            num_pages = len(pdf.pages)
+
+        for i in range(num_pages):
+            yield i+1
+
+
+    def unusedPageNums(self) -> list[int]:
+        with pdfplumber.open(self._file_path) as pdf:
+            num_pages = len(pdf.pages)
+
+        unused_pages = [i+1 for i in range(num_pages)]
+        
+        for page in self._pages:
+            try:
+                unused_pages.remove(page._page_number)
+            except:
+                pass 
+
+        return unused_pages
+    
+    def has1ATable(self) -> list[int]:
+        has1A = False 
+        for page in self._pages:
+            if(page.has_1a_table):
+                has1A = True 
+        return has1A
+            
 
     class candidate_pages:
         """
