@@ -37,9 +37,9 @@ class extractor():
             else:
                 table_pagenum_list = [(pd.DataFrame(table.extract()),page.page_number) for page in file.pages for table in page.find_tables(table_settings=self.table_settings)]
 
-            tables = [table_and_page[0] for table_and_page in table_pagenum_list]
-            page_nums = [table_and_page[1] for table_and_page in table_pagenum_list]
-            return tables,page_nums
+            # tables = [table_and_page[0] for table_and_page in table_pagenum_list]
+            # page_nums = [table_and_page[1] for table_and_page in table_pagenum_list]
+            return table_pagenum_list
 
     def extract(self,folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]):
         """
@@ -48,8 +48,8 @@ class extractor():
         pdfsobj_list = []
 
         for path,file_name in extractor.recursiveFilePathIterator(folder_name,accepted_formats):
-            tables = self.extract_table(path)
-            pdf_obj = pdf(file_name,path,tables)
+            tableswithnums = self.extract_table(path)
+            pdf_obj = pdf(file_name,path,tableswithnums)
             pdfsobj_list.append(pdf_obj)
             
         return pdfsobj_list
@@ -99,6 +99,7 @@ class a1checker():
         "Het bedrag van de overschrijding en de reden waarom de overschrijding al dan niet is toegestaan",
         "Toelichting op de vordering wegens onverschuldigde betaling"
         ]
+
     
     def fuzzyElemMatching(self,table_elem:str,targetWord:str,threshold:float) -> bool:
         """
@@ -133,19 +134,19 @@ class a1checker():
         
         return [pos for pos in positions]
 
-    def is1aOrNot(self, threshold):
-        default_list = [False] * 13
+    def is1aOrNotFolder(self, threshold:float,extractObj:extractor,pdf_folder_name:str="pdfs") -> None:
+        default_list = [False] * 13 #rows from A1 table
         print(default_list)
-        index = 0;
-        for datapoint in checker.data_points:
+        index = 0
+        for datapoint in self.data_points:
             print(datapoint)
             standardTables = []
-            for pdf_obj in extractObj.extract("pdfs"):
+            for pdf_obj in extractObj.extract(pdf_folder_name):
                 for table in pdf_obj.tables[0]:
                     # print(checker.findFuzzyMatchInTable(table,"Bezoldiging",threshold))
-                    print(checker.findFuzzyMatchInTable(table, datapoint, threshold))
+                    print(self.findFuzzyMatchInTable(table, datapoint, threshold))
                     isStandard = True
-                    if (len(checker.findFuzzyMatchInTable(table, datapoint, threshold)) == 0):
+                    if (len(self.findFuzzyMatchInTable(table, datapoint, threshold)) == 0):
                         isStandard = False
                         break
                     else:
@@ -154,17 +155,40 @@ class a1checker():
                     if (isStandard):
                         standardTables.append((pdf_obj, table))
             index += 1
-        print (default_list)
+        print(default_list)
         count_true = default_list.count(True)
         if count_true >=10:
             print("Found ", count_true, "datapoints.", "this is 1a Table")
         else:
             print("Found ", count_true, "datapoints", "Not 1a Table")
 
+    
+    
+    def is1aOrNot(self,pdfObj:pdf,threshold:float,pdf_folder_name:str="pdfs") -> list[int]:
+        default_list = [False] * 13 #rows from A1 table
+        
+        pageNumsWithA1Table = []
+
+        for table,pagenum in pdfObj.tables:
+            print(pagenum)
+        
+        
+
+        #     for index,datapoint in enumerate(checker.data_points):   
+            
+
+         
+
+
+
+
 if __name__ == "__main__":
-    extractObj = extractor()
+    treshold = 0.7
+
+
+    Extractor = extractor()
     checker = a1checker()
-    threshold = 0.7
-    checker.is1aOrNot(threshold)
 
-
+    for pdfobj in Extractor.extract("pdfs"):
+        checker.is1aOrNot(pdfobj,treshold)
+        
