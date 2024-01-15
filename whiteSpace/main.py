@@ -7,7 +7,7 @@ class PDFProcessor:
         self.results = []
 
     def process_pdf(self, pdf_path, target_page, names):
-        pdf_path = f"pdfs/{pdf_path}.pdf"
+        pdf_path = pdf_path
         
         try:
             target_page = int(target_page)
@@ -67,9 +67,9 @@ class PDFProcessor:
 
 # Example Usage:
   
-pdf_path="DigiMV2020_7FMRR3X2P7_0_05072572_Jaarrekening_6286_Stichting ZGR"
+pdf_path="whiteSpace/pdfs/DigiMV2020_7FMRR3X2P7_0_05072572_Jaarrekening_6286_Stichting ZGR.pdf"
 pagenumber=30
-keyword_finder = KeywordFinder(f"pdfs/{pdf_path}.pdf")
+keyword_finder = KeywordFinder(pdf_path)
 result = keyword_finder.find_keywords_with_context(pagenumber)
 keyword_finder.close()
 listofnames=result               
