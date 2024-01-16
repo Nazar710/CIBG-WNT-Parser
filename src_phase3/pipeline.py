@@ -8,11 +8,13 @@ import candidatepageFinder.speedy_candidates as speedy_candidates
 from tqdm import tqdm
 from visualDebug.visualMain import PDFProcessorApp
 from tkinterdnd2 import DND_FILES, TkinterDnD
+import os
 
 
 
 def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     #whitespace tables
+
     keyword_finder = nameFind.KeywordFinder(pdf_path)
     result = keyword_finder.find_keywords_with_context(pagenumber)
     keyword_finder.close()
@@ -68,6 +70,18 @@ def pipeline(pdf_path_list:list[str]):
                 searchable_pdf_page_output_path = f'tempSearchable.pdf'
                 searchable_pdf_page.save(searchable_pdf_page_output_path)
                 whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF)
+                
+    for pdf in tqdm(wrappedPdfs):
+        for page in pdf.pages:
+            if page.has_1a_table:
+                if type(page._tables) is list:
+                    for tablenum, table in enumerate(page._tables):
+                        csv_path = pdf.file_name+str(page.page_number+tablenum)
+                        table.to_csv(csv_path)
+                        page.csv_path(csv_path)
+                else:
+                    csv_path = str(pdf.file_name + str(page.page_number))
+                    page._tables.to_csv(csv_path)
 
 if __name__ == "__main__":
     root = TkinterDnD.Tk()
