@@ -10,7 +10,8 @@ import pandas as pd
 import openpyxl
 from pandastable import Table
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pdfWrapper import PDF_wrapper
+from a1checker.pdfWrapper import PDF_wrapper
+import matplotlib.pyplot as plt
 
 class PDFViewer:
 
@@ -162,7 +163,7 @@ class PDFViewer:
             mat = fitz.Matrix(zoom_level, zoom_level)  # Zoom factor
             pix = page.get_pixmap(matrix=mat)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-            photo = ImageTk.PhotoImage(image=img)
+            photo = ImageTk.PhotoImage(master = canvas,image=img)
             canvas.delete("all")  # Clear previous image
             canvas.create_image(0, 0, image=photo, anchor='nw')
             canvas.config(scrollregion=canvas.bbox('all'))
@@ -307,15 +308,15 @@ class PDFViewer:
 
 # folder_path = 'dataProcessing/allPDF_1'
 # pdf_files = [f for f in os.listdir(folder_path) if f.endswith('.pdf')]
-wrappers = []
-wrapper1 = PDF_wrapper("wnt_not_scanned","src\pipeline\wnt_not_scanned.pdf")
-wrapper1.add_page(35,True,False,True,'src\pipeline\speedy_candidates_results.csv', "exact match coördinate")
-wrappers.append(wrapper1)
-wrapper2 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
-wrapper2.add_page(34,False,True,True,"src/pipeline/visualDebug/1a_template.xlsx", "ocr")
-wrappers.append(wrapper2)
-wrapper3 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
-wrapper3.add_page(20,True,True,False,"","Mathias")
-wrappers.append(wrapper3)
-viewer = PDFViewer(wrappers)
-viewer.run()
+# wrappers = []
+# wrapper1 = PDF_wrapper("wnt_not_scanned","src\pipeline\wnt_not_scanned.pdf")
+# wrapper1.add_page(35,True,False,True,'src\pipeline\speedy_candidates_results.csv', "exact match coördinate")
+# wrappers.append(wrapper1)
+# wrapper2 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
+# wrapper2.add_page(34,False,True,True,"src/pipeline/visualDebug/1a_template.xlsx", "ocr")
+# wrappers.append(wrapper2)
+# wrapper3 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
+# wrapper3.add_page(20,True,True,False,"","Mathias")
+# wrappers.append(wrapper3)
+# viewer = PDFViewer(wrappers)
+# viewer.run()
