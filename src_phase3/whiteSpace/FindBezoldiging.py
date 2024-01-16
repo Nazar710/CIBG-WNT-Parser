@@ -18,11 +18,11 @@ def FinderAlgorithm(pdf_path, names, target_page):
         # Find instances of 'Totaal', 'Totale', and 'Bezoldiging' keywords
         for keyword in salary_keywords:
             if " Totaal " in keyword:
-                totaal_instances = page.search_for(keyword, rect=name_coordinates[name])
+                totaal_instances = page.search_for(keyword, clip=name_coordinates[name])
             elif "Totale" in keyword:
-                totale_instances = page.search_for(keyword, rect=name_coordinates[name])
+                totale_instances = page.search_for(keyword, clip=name_coordinates[name])
             elif " Bezoldiging " in keyword:
-                bezoldiging_instances = page.search_for(keyword, rect=name_coordinates[name])
+                bezoldiging_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Now max_y contains the updated maximum y-coordinate based on the conditions
 
@@ -61,7 +61,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Functie' keyword
         for keyword in ["Functie"]:
-            functie_instances = page.search_for(keyword, rect=name_coordinates[name])
+            functie_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Functie' keyword instances
         for functie_instance in functie_instances:
@@ -76,7 +76,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Bezoldigingsmaximum' keyword
         for keyword in ["Bezoldigingsmaximum"]:
-            bezoldigingsmaximum_instances = page.search_for(keyword, rect=name_coordinates[name])
+            bezoldigingsmaximum_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Bezoldigingsmaximum' keyword instances
         for bezoldigingsmaximum_instance in bezoldigingsmaximum_instances:
@@ -90,7 +90,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Functievervulling' keyword
         for keyword in ["Functievervulling"]:
-            functievervulling_instances = page.search_for(keyword, rect=name_coordinates[name])
+            functievervulling_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Functievervulling' keyword instances
         for functievervulling_instance in functievervulling_instances:
@@ -105,7 +105,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Dienstverband' keyword
         for keyword in ["Dienstverband"]:
-            dienstverband_instances = page.search_for(keyword, rect=name_coordinates[name])
+            dienstverband_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Dienstverband' keyword instances
         for dienstverband_instance in dienstverband_instances:
@@ -130,7 +130,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Dienstbetrekking' keyword
         for keyword in ["Dienstbetrekking"]:
-            dienstbetrekking_instances = page.search_for(keyword, rect=name_coordinates[name])
+            dienstbetrekking_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Dienstbetrekking' keyword instances
         for dienstbetrekking_instance in dienstbetrekking_instances:
@@ -145,7 +145,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Beloning' keyword
         for keyword in ["Beloning"]:
-            beloning_instances = page.search_for(keyword, rect=name_coordinates[name])
+            beloning_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Beloning' keyword instances
         for beloning_instance in beloning_instances:
@@ -160,7 +160,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Beloningen' keyword
         for keyword in ["Beloningen"]:
-            beloningen_instances = page.search_for(keyword, rect=name_coordinates[name])
+            beloningen_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Beloningen' keyword instances
         for beloningen_instance in beloningen_instances:
@@ -175,7 +175,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Subtotaal' keyword
         for keyword in ["Subtotaal"]:
-            subtotaal_instances = page.search_for(keyword, rect=name_coordinates[name])
+            subtotaal_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Subtotaal' keyword instances
         for subtotaal_instance in subtotaal_instances:
@@ -190,7 +190,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Bezoldigingsmaximum' keyword
         for keyword in ["Bezoldigingsmaximum"]:
-            bezoldigingsmaximum_instances = page.search_for(keyword, rect=name_coordinates[name])
+            bezoldigingsmaximum_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Bezoldigingsmaximum' keyword instances
         for bezoldigingsmaximum_instance in bezoldigingsmaximum_instances:
@@ -205,7 +205,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Onverschuldigd' keyword
         for keyword in ["Onverschuldigd"]:
-            onverschuldigd_instances = page.search_for(keyword, rect=name_coordinates[name])
+            onverschuldigd_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Onverschuldigd' keyword instances
         for onverschuldigd_instance in onverschuldigd_instances:
@@ -220,7 +220,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Overschrijding' keyword
         for keyword in ["Overschrijding"]:
-            overschrijding_instances = page.search_for(keyword, rect=name_coordinates[name])
+            overschrijding_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Overschrijding' keyword instances
         for overschrijding_instance in overschrijding_instances:
@@ -235,7 +235,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
         # Find instances of 'Toelichting' keyword
         for keyword in ["Toelichting"]:
-            toelichting_instances = page.search_for(keyword, rect=name_coordinates[name])
+            toelichting_instances = page.search_for(keyword, clip=name_coordinates[name])
 
         # Check for 'Toelichting' keyword instances
         for toelichting_instance in toelichting_instances:

@@ -166,7 +166,7 @@ class PDFProcessorApp:
     def extract_files(self):
         path_list = self.get_files()
         """TODO send this list to sander's method to get it started"""
-        self.pipeline_Func(path_list)
+        self.pipeline_Func(path_list,folder_path = self.path_var.get())
 
 
 
