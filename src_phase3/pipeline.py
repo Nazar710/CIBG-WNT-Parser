@@ -29,7 +29,7 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
         wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="",tables=tables)
 
 
-def pipeline(pdf_path_list:list[str]):
+def pipeline(pdf_path_list:list[str], folder_path: str):
     #hyper param
     treshold = 0.7 
     keywords = ["bezoldiging", "wnt"]
@@ -76,11 +76,11 @@ def pipeline(pdf_path_list:list[str]):
             if page.has_1a_table:
                 if type(page._tables) is list:
                     for tablenum, table in enumerate(page._tables):
-                        csv_path = pdf.file_name+str(page.page_number+tablenum)
+                        csv_path = os.path.join(folder_path, pdf.file_name+str(page.page_number+tablenum))
                         table.to_csv(csv_path)
-                        page.csv_path(csv_path)
+                        page.csv_path = csv_path
                 else:
-                    csv_path = str(pdf.file_name + str(page.page_number))
+                    csv_path = os.path.join(folder_path, str(pdf.file_name + str(page.page_number)))
                     page._tables.to_csv(csv_path)
 
 if __name__ == "__main__":
