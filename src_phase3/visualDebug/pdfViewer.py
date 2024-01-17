@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 class PDFViewer:
 
     def __init__(self, wrapperlist):
-        self.root = TkinterDnD.Tk()
+        self.root = tk.Toplevel()
         self.root.title('')
         self.wrapperlist = wrapperlist
         width= self.root.winfo_screenwidth() 
@@ -199,9 +199,9 @@ class PDFViewer:
         """displays the table that was extracted for each pdf with functionality for saving, undoing and
         editing the table"""
         f = tk.Frame(window, width=650, height=800)
-        f.pack(side = "right", fill="none", expand=True)
         self.file_name_original_csv = csv_path
         self.window = window
+        f.pack(side = "right", fill="none", expand=True)
         # just for testing: check if the csv is in excel format and handle it as excel, otherwise as csv
         if ".xlsx" in csv_path:
             self.df = pd.read_excel(self.file_name_original_csv)
