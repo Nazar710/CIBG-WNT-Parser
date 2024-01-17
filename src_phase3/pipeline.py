@@ -13,7 +13,7 @@ import os
 
 
 
-def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
+def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper,csv_method:str) -> None:
     #whitespace tables
 
     keyword_finder = nameFind.KeywordFinder(pdf_path)
@@ -24,10 +24,10 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     pdf_processor.process_pdf(pdf_path=pdf_path, target_page=pagenumber, names=listofnames)
     #page_number:int, selectable:bool, scanned:bool, has_1a_table:bool, csv_path:str,csv_method:str,tables:list[pd.DataFrame])
     tables = pdf_processor.return_results()
-    
+    print(tables)
     if(len(tables) > 0):
         #only adds page if it's 1a
-        wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="",tables=tables)
+        wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method=csv_method,tables=tables)
 
 
 def pipeline(pdf_path_list:list[str], folder_path: str):
@@ -43,7 +43,9 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
 
     wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
 
-    for wrappedPDF in wrappedPdfs:
+    not_a1_wrappedPdfs = [pdf for pdf in wrappedPdfs if not pdf.has1ATable]
+
+    for wrappedPDF in not_a1_wrappedPdfs:
         pdf_path = wrappedPDF.file_path
         candidate_finder = speedy_candidates.candidates(keywords)
         #candidate pages 
@@ -51,12 +53,12 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
 
         for pagenumber in candidate_pages:     
             #exact match 
-            exact_match_table,isExactMatch = exactmatch_whitespace.extract_data_from_pdf(pdf_path,pagenumber,minNumRowsMatched)
+            #exact_match_table,isExactMatch = exactmatch_whitespace.extract_data_from_pdf(pdf_path,pagenumber,minNumRowsMatched)
             
-            if(isExactMatch):
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="",tables=exact_match_table)
-            else: #not exact match 
-                whiteSpace(pdf_path,pagenumber,wrappedPDF)
+            #if(isExactMatch):
+            #    wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact white space match",tables=exact_match_table)
+           # else: #not exact match 
+            whiteSpace(pdf_path,pagenumber,wrappedPDF,csv_method="white space match")
 
         if(not wrappedPDF.has1ATable):
             
@@ -70,7 +72,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                 # Save the output searchable PDF for the specific page to a file
                 searchable_pdf_page_output_path = f'tempSearchable.pdf'
                 searchable_pdf_page.save(searchable_pdf_page_output_path)
-                whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF)
+                whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF,csv_method="OCR whitespace match")
                 
     for pdf in tqdm(wrappedPdfs):
         for page in pdf.pages:
