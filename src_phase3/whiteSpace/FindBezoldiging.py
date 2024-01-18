@@ -61,10 +61,11 @@ def FinderAlgorithm(pdf_path, names, target_page):
     def find_function(name):
         # Initialize variable to store the found instances
         functie_instances = []
+        rect = fitz.Rect(name_coordinates[name])
 
         # Find instances of 'Functie' keyword
         for keyword in ["Functie"]:
-            functie_instances = page.search_for(keyword, rect=name_coordinates[name])
+            functie_instances = page.search_for(keyword, rect=rect)
 
         # Check for 'Functie' keyword instances
         for functie_instance in functie_instances:
