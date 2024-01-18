@@ -19,7 +19,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
         # Find instances of 'Totaal', 'Totale', and 'Bezoldiging' keywords
         for keyword in salary_keywords:
             if " Totaal " in keyword:
-                totaal_instances = page.search_for(" Totaal " )            
+                totaal_instances = page.search_for(keyword)            
             elif "Totale" in keyword:
                 totale_instances = page.search_for(keyword)
                 print(totale_instances) 
