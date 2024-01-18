@@ -27,7 +27,7 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     
     if(len(tables) > 0):
         #only adds page if it's 1a
-        wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="",tables=tables)
+        wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="white space",tables=tables)
 
 
 def pipeline(pdf_path_list:list[str], folder_path: str):
@@ -54,7 +54,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             exact_match_table,isExactMatch = exactmatch_whitespace.extract_data_from_pdf(pdf_path,pagenumber,minNumRowsMatched)
             
             if(isExactMatch):
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="",tables=exact_match_table)
+                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact white space",tables=exact_match_table)
             else: #not exact match 
                 whiteSpace(pdf_path,pagenumber,wrappedPDF)
 
