@@ -72,7 +72,7 @@ pagenumber=30
 keyword_finder = KeywordFinder(pdf_path)
 result = keyword_finder.find_keywords_with_context(pagenumber)
 keyword_finder.close()
-listofnames=result               
+listofnames=result         
 
 pdf_processor = PDFProcessor()
 pdf_processor.process_pdf(pdf_path=pdf_path, target_page=pagenumber, names=listofnames)

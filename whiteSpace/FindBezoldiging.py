@@ -297,7 +297,6 @@ def FinderAlgorithm(pdf_path, names, target_page):
             onverschuldigdString =""
             overschrijdingString =""
             toelichtingString =""
-            text_in_region=""
 
             salary_coordinates = find_salary_coordinates(name)
             function_coordinates = find_function(name)

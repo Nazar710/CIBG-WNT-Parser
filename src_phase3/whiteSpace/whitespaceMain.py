@@ -17,6 +17,7 @@ class PDFProcessor:
         if pdf_path and names:
             result_list = FinderAlgorithm(pdf_path, names, target_page - 1)
 
+
             self.results.append({
                 'pdf_path': pdf_path,
                 'names': names,

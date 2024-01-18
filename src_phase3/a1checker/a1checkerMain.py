@@ -149,7 +149,8 @@ class a1checker():
 
         the result will always be x = row y = column. position is [row,column]
         """
-        boolean_table = table.map(partial(self.fuzzyElemMatching,threshold=threshold,targetWord=targetWord)).to_numpy()
+        boolean_table = table.applymap(partial(self.fuzzyElemMatching, threshold=threshold, targetWord=targetWord)).to_numpy()
+
         x,y = boolean_table.nonzero()
         positions = np.concatenate((np.expand_dims(x,axis=1),np.expand_dims(y,axis=1)),axis=1)
         
