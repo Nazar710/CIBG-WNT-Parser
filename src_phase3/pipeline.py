@@ -60,7 +60,6 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
 
         if(not wrappedPDF.has1ATable):
             
-            
             for pagenum in tqdm(candidate_finder.needsOCR(pdf_path,hidden_progress_bar),ascii=True,desc="OCR"):
                 # Create an instance of SearchablePDFConverter
                 pdf_converter = scannedConvert.SearchablePDFConverter(pdf_path, tesseract_cmd_path)

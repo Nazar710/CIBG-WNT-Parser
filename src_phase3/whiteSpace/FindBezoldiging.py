@@ -4,10 +4,11 @@ import re
 def FinderAlgorithm(pdf_path, names, target_page):
     def complete_name_instance(name_instance):
         if name_instance.x1 == page.rect.width:
-            next_line_instances = page.search_for(name, rect=(name_instance.x0, 0, page.rect.width, page.rect.height))
-            if next_line_instances:
+            next_line_instances = page.search_for(name, clip=(name_instance.x0, 0, page.rect.width, page.rect.height))
+            if next_line_instances:      
                 return fitz.Rect(name_instance.x0, name_instance.y0, next_line_instances[0].x1, next_line_instances[0].y1)
         return name_instance
+    
 
     def find_salary_coordinates(name):
         # Initialize variables to store the found instances
@@ -15,16 +16,16 @@ def FinderAlgorithm(pdf_path, names, target_page):
         totale_instances = []
         bezoldiging_instances = []
 
-        rect = fitz.Rect(name_coordinates[name])
-
         # Find instances of 'Totaal', 'Totale', and 'Bezoldiging' keywords
         for keyword in salary_keywords:
             if " Totaal " in keyword:
-                totaal_instances = page.search_for(keyword, rect=rect)
+                totaal_instances = page.search_for(" Totaal " )            
             elif "Totale" in keyword:
-                totale_instances = page.search_for(keyword, rect=rect)
+                totale_instances = page.search_for(keyword)
+                print(totale_instances) 
             elif " Bezoldiging " in keyword:
-                bezoldiging_instances = page.search_for(keyword, rect=rect)
+                bezoldiging_instances = page.search_for(keyword)
+                print(bezoldiging_instances) 
 
         # Now max_y contains the updated maximum y-coordinate based on the conditions
 
@@ -36,7 +37,6 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
                 if number_in_region is not None:
                     return salary_instance
-                
 
         # Check for 'Totaal' keyword instances
         for salary_instance in totaal_instances:
@@ -61,11 +61,10 @@ def FinderAlgorithm(pdf_path, names, target_page):
     def find_function(name):
         # Initialize variable to store the found instances
         functie_instances = []
-        rect = fitz.Rect(name_coordinates[name])
 
         # Find instances of 'Functie' keyword
         for keyword in ["Functie"]:
-            functie_instances = page.search_for(keyword, rect=rect)
+            functie_instances = page.search_for(keyword)
 
         # Check for 'Functie' keyword instances
         for functie_instance in functie_instances:
@@ -77,11 +76,10 @@ def FinderAlgorithm(pdf_path, names, target_page):
     def find_bezoldigingsmaximum(name):
         # Initialize variable to store the found instances
         bezoldigingsmaximum_instances = []
-        rect = fitz.Rect(name_coordinates[name])
 
         # Find instances of 'Bezoldigingsmaximum' keyword
         for keyword in ["Bezoldigingsmaximum"]:
-            bezoldigingsmaximum_instances = page.search_for(keyword, rect=rect)
+            bezoldigingsmaximum_instances = page.search_for(keyword)
 
         # Check for 'Bezoldigingsmaximum' keyword instances
         for bezoldigingsmaximum_instance in bezoldigingsmaximum_instances:
@@ -92,11 +90,10 @@ def FinderAlgorithm(pdf_path, names, target_page):
     def find_functievervulling(name):
         # Initialize variable to store the found instances
         functievervulling_instances = []
-        rect = fitz.Rect(name_coordinates[name])
 
         # Find instances of 'Functievervulling' keyword
         for keyword in ["Functievervulling"]:
-            functievervulling_instances = page.search_for(keyword, rect=rect)
+            functievervulling_instances = page.search_for(keyword)
 
         # Check for 'Functievervulling' keyword instances
         for functievervulling_instance in functievervulling_instances:
@@ -106,13 +103,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
     
     def find_dienstverband(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         dienstverband_instances = []
 
         # Find instances of 'Dienstverband' keyword
         for keyword in ["Dienstverband"]:
-            dienstverband_instances = page.search_for(keyword, rect=rect)
+            dienstverband_instances = page.search_for(keyword)
 
         # Check for 'Dienstverband' keyword instances
         for dienstverband_instance in dienstverband_instances:
@@ -132,13 +128,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
 
 
     def find_dienstbetrekking(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         dienstbetrekking_instances = []
 
         # Find instances of 'Dienstbetrekking' keyword
         for keyword in ["Dienstbetrekking"]:
-            dienstbetrekking_instances = page.search_for(keyword, rect=rect)
+            dienstbetrekking_instances = page.search_for(keyword)
 
         # Check for 'Dienstbetrekking' keyword instances
         for dienstbetrekking_instance in dienstbetrekking_instances:
@@ -148,13 +143,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
 
     def find_beloning(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         beloning_instances = []
 
         # Find instances of 'Beloning' keyword
         for keyword in ["Beloning"]:
-            beloning_instances = page.search_for(keyword, rect=rect)
+            beloning_instances = page.search_for(keyword)
 
         # Check for 'Beloning' keyword instances
         for beloning_instance in beloning_instances:
@@ -164,13 +158,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
 
     def find_beloningen(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         beloningen_instances = []
 
         # Find instances of 'Beloningen' keyword
         for keyword in ["Beloningen"]:
-            beloningen_instances = page.search_for(keyword, rect=rect)
+            beloningen_instances = page.search_for(keyword)
 
         # Check for 'Beloningen' keyword instances
         for beloningen_instance in beloningen_instances:
@@ -180,13 +173,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
 
     def find_subtotaal(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         subtotaal_instances = []
 
         # Find instances of 'Subtotaal' keyword
         for keyword in ["Subtotaal"]:
-            subtotaal_instances = page.search_for(keyword, rect=rect)
+            subtotaal_instances = page.search_for(keyword)
 
         # Check for 'Subtotaal' keyword instances
         for subtotaal_instance in subtotaal_instances:
@@ -196,13 +188,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
 
     def find_bezoldigingsmaximum(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         bezoldigingsmaximum_instances = []
 
         # Find instances of 'Bezoldigingsmaximum' keyword
         for keyword in ["Bezoldigingsmaximum"]:
-            bezoldigingsmaximum_instances = page.search_for(keyword, rect=rect)
+            bezoldigingsmaximum_instances = page.search_for(keyword)
 
         # Check for 'Bezoldigingsmaximum' keyword instances
         for bezoldigingsmaximum_instance in bezoldigingsmaximum_instances:
@@ -212,13 +203,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
 
     def find_onverschuldigd(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         onverschuldigd_instances = []
 
         # Find instances of 'Onverschuldigd' keyword
         for keyword in ["Onverschuldigd"]:
-            onverschuldigd_instances = page.search_for(keyword, rect=rect)
+            onverschuldigd_instances = page.search_for(keyword)
 
         # Check for 'Onverschuldigd' keyword instances
         for onverschuldigd_instance in onverschuldigd_instances:
@@ -228,13 +218,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
 
     def find_overschrijding(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         overschrijding_instances = []
 
         # Find instances of 'Overschrijding' keyword
         for keyword in ["Overschrijding"]:
-            overschrijding_instances = page.search_for(keyword, rect=rect)
+            overschrijding_instances = page.search_for(keyword)
 
         # Check for 'Overschrijding' keyword instances
         for overschrijding_instance in overschrijding_instances:
@@ -244,13 +233,12 @@ def FinderAlgorithm(pdf_path, names, target_page):
         return None    
 
     def find_toelichting(name):
-        rect = fitz.Rect(name_coordinates[name])
         # Initialize variable to store the found instances
         toelichting_instances = []
 
         # Find instances of 'Toelichting' keyword
         for keyword in ["Toelichting"]:
-            toelichting_instances = page.search_for(keyword, rect=rect)
+            toelichting_instances = page.search_for(keyword)
 
         # Check for 'Toelichting' keyword instances
         for toelichting_instance in toelichting_instances:
@@ -312,7 +300,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
             onverschuldigdString =""
             overschrijdingString =""
             toelichtingString =""
-            text_in_region=""
+            text_in_region = ""
 
             salary_coordinates = find_salary_coordinates(name)
             function_coordinates = find_function(name)
@@ -332,10 +320,10 @@ def FinderAlgorithm(pdf_path, names, target_page):
                 text_in_region = extract_text_in_region(name, salary_coordinates)
                 number_in_region = extract_number_from_text(text_in_region)
 
-                #print(f"Name: {name}")
-                #print(f"Text in Region: {text_in_region}")
-                #print(f"Number in Region: {number_in_region}")
-                #print("N-------------------------------------------------N")
+                print(f"Name: {name}")
+                print(f"Text in Region: {text_in_region}")
+                print(f"Number in Region: {number_in_region}")
+                print("N-------------------------------------------------N")
             
             if function_coordinates:
                 functionString = extract_text_in_region(name, function_coordinates)
