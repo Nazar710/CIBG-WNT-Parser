@@ -11,7 +11,8 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 import visualDebug.pdfViewer as debugger
 import os
 import sys
-
+import pandas as pd 
+import subprocess
 
 def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     #whitespace tables
@@ -40,6 +41,15 @@ class evaluator():
         """
 
 
+        phonebook = pd.read_excel(self.a1tablePagePhoneBook_path)
+        phonebook = phonebook[phonebook["1a present"] == 1]
+
+        for path_label,file_name in a1checkerMain.extractor.recursiveFilePathIterator(self.labelled_folder_path,["xlsx"]):
+            labeled_file = pd.read_excel(path_label)
+            print(path_label)
+
+
+            
 def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_bar = True,evaluater:evaluator=None):
     #hyper param
     treshold = 0.7 
@@ -96,8 +106,9 @@ def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_ba
                     page._tables.to_csv(csv_path)
 
     if(evaluater is not None):
+        subprocess.run(["clear"])
         evaluater.compare_to_all()
-
+        exit()
     debug_gui = debugger.PDFViewer(wrappedPdfs)
     debug_gui.run()
 
@@ -108,6 +119,10 @@ if __name__ == "__main__":
     no parameters when called: it runs UI.
     if pipeline is called with ui-off <pdf foldername> <output path> <label path> <a1tablePagePhoneBook path>
     
+
+    example:
+    python pipeline.py ui-off pdfs /home/hal9000/Documents/github/CIBG-WNT-Parser/src_phase3/output_folder /home/hal9000/Documents/github/CIBG-WNT-Parser/labeled_files_2 /home/hal9000/Documents/github/CIBG-WNT-Parser/src_phase3/DataPhase3LabeledDocs.xlsx
+
     """
     command = sys.argv[-5]
     pdf_folder_name = sys.argv[-4] #NOT A PATH ONLY A NAME!!!!
