@@ -13,6 +13,7 @@ import os
 import sys
 import pandas as pd 
 import subprocess
+import numpy as np 
 
 def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     #whitespace tables
@@ -42,28 +43,66 @@ class evaluator():
 
         total_phonebook = pd.read_excel(self.a1tablePagePhoneBook_path)
         A1_phonebook = total_phonebook[total_phonebook["1a present"] == 1]
+        wrong_page_number_count = 0
+        false_positive_a1_table = 0
 
-        for path_label,labeled_file_name in a1checkerMain.extractor.recursiveFilePathIterator(self.labelled_folder_path,["xlsx"]):
-            pdf_file_name =labeled_file_name[:-5]+".pdf"
-
+        for path_output_file,file_name in a1checkerMain.extractor.recursiveFilePathIterator(self.output_folder_path,["csv"]):
+            pdf_file_name =file_name[:-4].split("=")[-2]+".pdf"
+            pdf_table_page_num = file_name[:-4].split("=")[-1]
+            
+            #check if it has an a1 table
             if( (A1_phonebook["File name"] ==pdf_file_name).sum() == 1):
-                print(total_phonebook[total_phonebook["File name"] == labeled_file_name])
+                ground_truth_page_num = A1_phonebook["Pages"][A1_phonebook["File name"] ==pdf_file_name].values[0]
+                if(pdf_table_page_num != ground_truth_page_num):
+                    wrong_page_number_count += 1
             else:
+                false_positive_a1_table += 1
                 continue
             
-            #labeled file
-            labeled_file = pd.read_excel(path_label)
+            #output file
+            output_file = pd.read_csv(path_output_file,index_col=0)
 
+            #labeled_file
+            label_file = pd.read_excel(os.path.join(self.labelled_folder_path,pdf_file_name[:-4]+".pdf.xlsx"))
+
+            """
+            columns output_file:
+            Name', 'Bezoldiging', 'Functie', 'functievervullingString','Dienstverband', 'Dienstbetrekking', 'Beloning', 'Beloningen',
+            'Subtotaal', 'Bezoldigingsmaximum', 'Onverschuldigd', 'Overschrijding','Toelichting'
+            """
+
+            #NAME
+            set_names_found = set(output_file["Name"])
+            set_names_labelled = set(label_file.iloc[[0],1:].values[0]).union(set(label_file.iloc[[19],1:].values[0]))
+            
+
+            #results name matching
+            num_names_correct = len(set_names_found.intersection(set_names_labelled))
+            num_missing_names = len(set_names_labelled) - num_names_correct
+
+            #BEZOLDIGING
+            output_bezoldiging = output_file["Bezoldiging"]
+
+            label_bezoldiging_first_year = label_file.iloc[[14],1:]
+            label_bezoldiging_second_year = label_file.iloc[[31],1:]
+            
+            output_bezoldiging_vec = np.nan_to_num(output_bezoldiging.values)
+            label_bezoldiging_vec = np.nan_to_num(pd.concat((label_bezoldiging_first_year,label_bezoldiging_second_year)).values.reshape(-1))
+
+            #results  bezoldiging matching
+            num_missing_bezoldigingen = len(label_bezoldiging_vec) - output_bezoldiging_vec
+            num_matching_bezoldingen = (label_bezoldiging_vec[:len(output_bezoldiging_vec)] == output_bezoldiging_vec).sum()
+
+            #FUNCTIE
+            output_Functie = output_file["Functie"]
+            
+            print(label_file)
+            # label_functie = pd.concat((label_file.iloc[[1],1:],)
+                        
             exit()
-            #output file 
-            for output_file_name in os.listdir(self.output_folder_path):
-
-                print(output_file_name)    
-                # if(len(file_name[:-4]) <= len(output_file_name)  and file_name[:-4] is output_file_name[:len(file_name[:-4])]):
-                #     print(self.output_folder_path, " :  ", path_label)
 
 def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_bar = True,evaluater:evaluator=None):
-    # #hyper param
+    # # hyper param
     # treshold = 0.7 
     # keywords = ["bezoldiging", "wnt"]
     # minNumRowsMatched = 10
@@ -109,11 +148,11 @@ def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_ba
     #         if page.has_1a_table:
     #             if type(page._tables) is list:
     #                 for tablenum, table in enumerate(page._tables):
-    #                     csv_path = os.path.join(output_folder_path, pdf.file_name[:-4]+str(page.page_number+tablenum)+".csv")
+    #                     csv_path = os.path.join(output_folder_path, pdf.file_name[:-4] +"="  +str(page.page_number+tablenum)+".csv")
     #                     table.to_csv(csv_path)
     #                     page.csv_path = csv_path
     #             else:
-    #                 csv_path = os.path.join(output_folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
+    #                 csv_path = os.path.join(output_folder_path, str(pdf.file_name[:-4] + "=" + str(page.page_number)+".csv"))
     #                 page.csv_path = csv_path
     #                 page._tables.to_csv(csv_path)
 
@@ -150,9 +189,6 @@ if __name__ == "__main__":
         evaluater = evaluator(a1tablePagePhoneBook_path,output_folder_path,label_path)
 
         pipeline(pdf_path_list,output_folder_path,False,evaluater=evaluater)
-
-
-
     else:
         root = TkinterDnD.Tk()
         app = PDFProcessorApp(root,pipeline)
