@@ -10,7 +10,7 @@ from visualDebug.visualMain import PDFProcessorApp
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import visualDebug.pdfViewer as debugger
 import os
-
+import sys
 
 
 def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
@@ -29,14 +29,24 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
         #only adds page if it's 1a
         wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="white space",tables=tables)
 
+class evaluator():
+    def __init__(self,a1tablePagePhoneBook_path:str,output_folder_path:str,labelled_folder_path:str) -> None:    
+        self.output_folder_path = output_folder_path
+        self.labelled_folder_path = labelled_folder_path
+        self.a1tablePagePhoneBook_path = a1tablePagePhoneBook_path
 
-def pipeline(pdf_path_list:list[str], folder_path: str):
+    def compare_to_all(self):
+        """
+        """
+
+
+def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_bar = True,evaluater:evaluator=None):
     #hyper param
     treshold = 0.7 
     keywords = ["bezoldiging", "wnt"]
     minNumRowsMatched = 10
     tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
-    hidden_progress_bar = True
+    
         
     Extractor = a1checkerMain.extractor()
     checker = a1checkerMain.a1checker()
@@ -77,16 +87,46 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             if page.has_1a_table:
                 if type(page._tables) is list:
                     for tablenum, table in enumerate(page._tables):
-                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number+tablenum)+".csv")
+                        csv_path = os.path.join(output_folder_path, pdf.file_name[:-4]+str(page.page_number+tablenum)+".csv")
                         table.to_csv(csv_path)
                         page.csv_path = csv_path
                 else:
-                    csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
+                    csv_path = os.path.join(output_folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
                     page.csv_path = csv_path
                     page._tables.to_csv(csv_path)
+
+    if(evaluater is not None):
+        evaluater.compare_to_all()
+
     debug_gui = debugger.PDFViewer(wrappedPdfs)
     debug_gui.run()
+
+
+
 if __name__ == "__main__":
-    root = TkinterDnD.Tk()
-    app = PDFProcessorApp(root,pipeline)
-    root.mainloop()
+    """
+    no parameters when called: it runs UI.
+    if pipeline is called with ui-off <pdf foldername> <output path> <label path> <a1tablePagePhoneBook path>
+    
+    """
+    command = sys.argv[-5]
+    pdf_folder_name = sys.argv[-4] #NOT A PATH ONLY A NAME!!!!
+    output_folder_path = sys.argv[-3]
+    label_path = sys.argv[-2]
+    a1tablePagePhoneBook_path = sys.argv[-1]
+    
+    if(len(sys.argv) == 6 and command == "ui-off"):
+        print("no UI")
+
+        extracter = a1checkerMain.extractor()
+        pdf_path_list = [path_name[0] for path_name in extracter.recursiveFilePathIterator(pdf_folder_name)]
+        evaluater = evaluator(a1tablePagePhoneBook_path,output_folder_path,label_path)
+
+        pipeline(pdf_path_list,output_folder_path,evaluater=evaluater)
+
+
+
+    else:
+        root = TkinterDnD.Tk()
+        app = PDFProcessorApp(root,pipeline)
+        root.mainloop()
