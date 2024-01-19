@@ -78,12 +78,12 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                 if type(page._tables) is list:
                     for tablenum, table in enumerate(page._tables):
                         csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number+tablenum)+".csv")
-                        table.to_csv(csv_path)
+                        table.transpose().to_csv(csv_path)
                         page.csv_path = csv_path
                 else:
                     csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
                     page.csv_path = csv_path
-                    page._tables.to_csv(csv_path)
+                    page._tables.transpose().to_csv(csv_path)
     debug_gui = debugger.PDFViewer(wrappedPdfs)
     debug_gui.run()
 if __name__ == "__main__":
