@@ -40,16 +40,18 @@ class evaluator():
         """
         """
 
-
         phonebook = pd.read_excel(self.a1tablePagePhoneBook_path)
         phonebook = phonebook[phonebook["1a present"] == 1]
 
         for path_label,file_name in a1checkerMain.extractor.recursiveFilePathIterator(self.labelled_folder_path,["xlsx"]):
+            #labeled file
             labeled_file = pd.read_excel(path_label)
-            print(path_label)
 
+            #output file 
+            for output_file_name in os.listdir(self.output_folder_path):
+                if(len(file_name[:-4]) <= len(output_file_name)  and file_name[:-4] is output_file_name[:len(file_name[:-4])]):
+                    pass
 
-            
 def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_bar = True,evaluater:evaluator=None):
     #hyper param
     treshold = 0.7 
@@ -62,8 +64,8 @@ def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_ba
     checker = a1checkerMain.a1checker()
 
     wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
-
-    for wrappedPDF in wrappedPdfs:
+    print("STTART!!!")
+    for wrappedPDF in tqdm(wrappedPdfs,ascii=True,hidden_progress_bar=hidden_progress_bar):
         pdf_path = wrappedPDF.file_path
         candidate_finder = speedy_candidates.candidates(keywords)
         #candidate pages 
@@ -137,7 +139,7 @@ if __name__ == "__main__":
         pdf_path_list = [path_name[0] for path_name in extracter.recursiveFilePathIterator(pdf_folder_name)]
         evaluater = evaluator(a1tablePagePhoneBook_path,output_folder_path,label_path)
 
-        pipeline(pdf_path_list,output_folder_path,evaluater=evaluater)
+        pipeline(pdf_path_list,output_folder_path,False,evaluater=evaluater)
 
 
 
