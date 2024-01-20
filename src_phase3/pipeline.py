@@ -96,9 +96,87 @@ class evaluator():
             #FUNCTIE
             output_Functie = output_file["Functie"]
             
+            label_functie_vec = pd.concat((label_file.iloc[[1],1:],label_file.iloc[[20],1:])).values.reshape(-1)
+            output_functie_vec = output_Functie.values.reshape(-1)
+            
+            num_missing_functies = len(label_functie_vec) - len(output_functie_vec)
+            num_matching_functies = (label_functie_vec[:len(output_functie_vec)] == output_functie_vec).sum()
+
+
+            #functievervullingString
+            
+            functievervulling_output_vec = np.nan_to_num(output_file["functievervullingString"].values).reshape(-1)
+            functievervulling_label_vec = np.nan_to_num(pd.concat((label_file.iloc[[2],1:],label_file.iloc[[21],1:])).values).reshape(-1)
+
+            num_missing_functie_vervulling = len(functievervulling_label_vec) - len(functievervulling_output_vec)
+            num_matching_functie_vervulling = (functievervulling_label_vec[:len(functievervulling_output_vec)] == functievervulling_output_vec).sum()
+            
+            #Dienstverband
+            Dienstverband_output_vec =  np.nan_to_num(output_file["Dienstverband"].values).reshape(-1)
+            Dienstverband_label_vec = np.nan_to_num(pd.concat((label_file.iloc[[3],1:],label_file.iloc[[22],1:])).values).reshape(-1)
+
+            num_missing_Dienstverband = len(Dienstverband_label_vec) - len(Dienstverband_output_vec)
+            num_matching_Dienstverband = (Dienstverband_label_vec[:len(Dienstverband_output_vec)] == Dienstverband_output_vec).sum()
+            
+            #Dienstbetrekking
+
+            Dienstbetrekking_output_vec =  np.nan_to_num(output_file["Dienstbetrekking"].values).reshape(-1)
+            Dienstbetrekking_label_vec = np.nan_to_num(pd.concat((label_file.iloc[[4],1:],label_file.iloc[[23],1:])).values).reshape(-1)
+
+            num_missing_Dienstbetrekking = len(Dienstbetrekking_label_vec) - len(Dienstbetrekking_output_vec)
+            num_matching_Dienstbetrekking = (Dienstbetrekking_label_vec[:len(Dienstbetrekking_output_vec)] == Dienstbetrekking_output_vec).sum()
+
+            #Beloning
+            Beloning_output_vec =  np.nan_to_num(output_file["Beloning"].values).reshape(-1)
+            Beloning_label_vec = np.nan_to_num(pd.concat((label_file.iloc[[6],1:],label_file.iloc[[25],1:])).values).reshape(-1)
+
+            num_missing_Beloning = len(Beloning_label_vec) - len(Beloning_output_vec)
+            num_matching_Beloning = (Beloning_label_vec[:len(Beloning_output_vec)] == Beloning_output_vec).sum()
+
+            #Beloningen
+            Beloningen_output_vec =  np.nan_to_num(output_file["Beloningen"].values).reshape(-1)
+            Beloningen_label_vec = np.nan_to_num(pd.concat((label_file.iloc[[7],1:],label_file.iloc[[26],1:])).values).reshape(-1)
+
+            num_missing_Beloningen = len(Beloningen_label_vec) - len(Beloningen_output_vec)
+            num_matching_Beloningen = (Beloningen_label_vec[:len(Beloningen_output_vec)] == Beloningen_output_vec).sum()
+
+            #Subtotaal
+            Subtotaal_output_vec =  np.nan_to_num(output_file["Subtotaal"].values).reshape(-1)
+            Subtotaal_label_vec = np.nan_to_num(pd.concat((label_file.iloc[[8],1:],label_file.iloc[[27],1:])).values).reshape(-1)
+
+            num_missing_Subtotaal = len(Subtotaal_label_vec) - len(Subtotaal_output_vec)
+            num_matching_Subtotaal = (Subtotaal_label_vec[:len(Subtotaal_output_vec)] == Subtotaal_output_vec).sum()
+
+            #Bezoldigingsmaximum
+
+            Bezoldigingsmaximum_output_vec =  np.nan_to_num(output_file["Bezoldigingsmaximum"].values).reshape(-1)
+            Bezoldigingsmaximum_label_vec = np.nan_to_num(pd.concat((label_file.iloc[[10],1:],label_file.iloc[[29],1:])).values).reshape(-1)
+
+            num_missing_Bezoldigingsmaximum = len(Bezoldigingsmaximum_label_vec) - len(Bezoldigingsmaximum_output_vec)
+            num_matching_Bezoldigingsmaximum = (Bezoldigingsmaximum_label_vec[:len(Bezoldigingsmaximum_output_vec)] == Bezoldigingsmaximum_output_vec).sum()
+
+            #Onverschuldigd
+            Onverschuldigd_output_vec =  np.nan_to_num(output_file["Onverschuldigd"].values).reshape(-1)
+            Onverschuldigd_label_vec = np.nan_to_num((label_file.iloc[[12],1:]).values).reshape(-1)
+
+            num_missing_Onverschuldigd = len(Onverschuldigd_label_vec) - len(Onverschuldigd_output_vec)
+            num_matching_Onverschuldigd = (Onverschuldigd_label_vec[:len(Onverschuldigd_output_vec)] == Onverschuldigd_output_vec).sum()
+
+            #Overschrijding
+            Overschrijding_output_vec =  np.nan_to_num(output_file["Overschrijding"].values).reshape(-1)
+            Overschrijding_label_vec = np.nan_to_num((label_file.iloc[[16],1:]).values).reshape(-1)
+
+            num_missing_Overschrijding = len(Overschrijding_label_vec) - len(Overschrijding_output_vec)
+            num_matching_Overschrijding = (Overschrijding_label_vec[:len(Overschrijding_output_vec)] == Overschrijding_output_vec).sum()
+
+            #Toelichting
+            Toelichting_output_vec =  np.nan_to_num(output_file["Toelichting"].values).reshape(-1)
+            Toelichting_label_vec = np.nan_to_num((label_file.iloc[[17],1:]).values).reshape(-1)
+
+            num_missing_Toelichting = len(Toelichting_label_vec) - len(Toelichting_output_vec)
+            num_matching_Toelichting = (Toelichting_label_vec[:len(Toelichting_output_vec)] == Toelichting_output_vec).sum()
+
             print(label_file)
-            # label_functie = pd.concat((label_file.iloc[[1],1:],)
-                        
             exit()
 
 def pipeline(pdf_path_list:list[str], output_folder_path: str,hidden_progress_bar = True,evaluater:evaluator=None):
