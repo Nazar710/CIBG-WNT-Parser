@@ -6,7 +6,7 @@ class KeywordFinder:
         self.pdf_path = pdf_path
         self.doc = fitz.open(pdf_path)
 
-    def find_keywords_with_context(self, page_number, context_width=15, context_height=15):
+    def find_keywords_with_context(self, page_number, context_width=15, context_height=30):
         keywords = ["Bestuurder", "Voorzitter", "lid","Secretaris","Directeur"]
         unique_names = set()
         results = []
