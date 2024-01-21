@@ -32,10 +32,10 @@ class PDFProcessor:
         """
 
         return [pd.DataFrame(result['result_list'], columns=[
-                'Name', 'Bezoldiging', 'Functie', 'functievervullingString',
-                'Dienstverband', 'Dienstbetrekking', 'Beloning', 'Beloningen',
-                'Subtotaal', 'Bezoldigingsmaximum', 'Onverschuldigd',
-                'Overschrijding', 'Toelichting'
+                'bedragen x €', 'Bezoldiging', 'Functiegegevens', 'Aanvang en einde functievervulling',
+                'Omvang dienstverband (als deeltijdfactor in fte)', 'Dienstbetrekking?', 'Beloning plus belastbare onkostenvergoedingen', 'Beloningen betaalbaar op termijn',
+                'Subtotaal', 'Individueel toepasselijke bezoldigingsmaximum', '-/- Onverschuldigd betaald en nog niet terugontvangen bedrag',
+                'Het bedrag van de overschrijding en de reden waarom de overschrijding al dan niet is toegestaan', 'Toelichting op de vordering wegens onverschuldigde betaling'
             ]) for result in self.results] 
 
     def save_results_to_csv(self, output_csv_path):
