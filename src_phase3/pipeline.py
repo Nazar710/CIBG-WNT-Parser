@@ -1,5 +1,6 @@
 import a1checker.a1checkerMain as a1checkerMain 
 import a1checker.pdfWrapper as pdfWrapper
+import a1checker.better_match as better_match
 import whiteSpace.nameFind as nameFind
 import whiteSpace.whitespaceMain as whitespaceMain
 import whiteSpace.scannedConvert as scannedConvert
@@ -40,6 +41,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
         
     Extractor = a1checkerMain.extractor()
     checker = a1checkerMain.a1checker()
+    matcher = better_match.better_match()
 
     wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
 
@@ -51,10 +53,10 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
 
         for pagenumber in candidate_pages:     
             #exact match 
-            exact_match_table,isExactMatch = exactmatch_whitespace.extract_data_from_pdf(pdf_path,pagenumber,minNumRowsMatched)
+            match_tables = matcher.get_tables(pdf_path=pdf_path,page_number=pagenumber)
             
-            if(isExactMatch):
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact white space",tables=exact_match_table)
+            if len(match_tables)>0:
+                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="better matcher",tables=match_tables)
             else: #not exact match 
                 whiteSpace(pdf_path,pagenumber,wrappedPDF)
 
@@ -77,13 +79,22 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             if page.has_1a_table:
                 if type(page._tables) is list:
                     for tablenum, table in enumerate(page._tables):
-                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number+tablenum)+".csv")
-                        table.transpose().to_csv(csv_path)
+                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number)+str(tablenum)+".csv")
+                        if not page.csv_method == "better matcher":
+                            table.transpose().to_csv(csv_path)
+                        else:
+                            table.to_csv(csv_path)
                         page.csv_path = csv_path
+                        
+                            
                 else:
                     csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
                     page.csv_path = csv_path
-                    page._tables.transpose().to_csv(csv_path)
+                    if not page.csv_method == "better matcher":
+                        table.transpose().to_csv(csv_path)
+                    else:
+                        table.to_csv(csv_path)
+                        
     debug_gui = debugger.PDFViewer(wrappedPdfs)
     debug_gui.run()
 if __name__ == "__main__":
