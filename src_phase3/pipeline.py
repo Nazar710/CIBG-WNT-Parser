@@ -10,6 +10,7 @@ from visualDebug.visualMain import PDFProcessorApp
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import visualDebug.pdfViewer as debugger
 import os
+import a1checker.better_exact_match as match
 
 
 
@@ -29,8 +30,47 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
         #only adds page if it's 1a
         wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="",tables=tables)
 
-
 def pipeline(pdf_path_list:list[str], folder_path: str):
+    #hyper param
+    treshold = 0.7 
+    keywords = ["bezoldiging", "wnt"]
+    minNumRowsMatched = 10
+    tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
+    hidden_progress_bar = True
+        
+    better_matcher = match.better_exact_match()
+    Extractor = a1checkerMain.extractor()
+    checker = a1checkerMain.a1checker()
+
+    wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
+    
+    for wrappedPDF in wrappedPdfs:
+        pdf_path = wrappedPDF.file_path
+        candidate_finder = speedy_candidates.candidates(keywords)
+        #candidate pages 
+        candidate_pages = candidate_finder.get_candidates(pdf_path,hide_progress_bar=hidden_progress_bar)
+        
+        for pagenumber in candidate_pages:
+            dfs = better_matcher.get_tables(pdf_path,pagenumber)
+            if len(dfs) > 0:
+                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="better match",tables=dfs)
+            
+    for pdf in tqdm(wrappedPdfs):
+        for page in pdf.pages:
+            if page.has_1a_table:
+                if type(page._tables) is list:
+                    for tablenum, table in enumerate(page._tables):
+                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number)+str(tablenum)+".csv")
+                        table.to_csv(csv_path)
+                        page.csv_path = csv_path
+                else:
+                    csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
+                    page.csv_path = csv_path
+                    page._tables.to_csv(csv_path)
+    debug_gui = debugger.PDFViewer(wrappedPdfs)
+    debug_gui.run()
+    
+def original_pipeline(pdf_path_list:list[str], folder_path: str):
     #hyper param
     treshold = 0.7 
     keywords = ["bezoldiging", "wnt"]
