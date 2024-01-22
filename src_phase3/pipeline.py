@@ -58,7 +58,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             else: #not exact match 
                 whiteSpace(pdf_path,pagenumber,wrappedPDF)
 
-        if(not wrappedPDF.has1ATable):
+        if(not wrappedPDF.has1ATableC):
             
             for pagenum in tqdm(candidate_finder.needsOCR(pdf_path,hidden_progress_bar),ascii=True,desc="OCR"):
                 # Create an instance of SearchablePDFConverter
