@@ -92,7 +92,7 @@ def FinderAlgorithm(pdf_path, names, target_page):
         functievervulling_instances = []
 
         # Find instances of 'Functievervulling' keyword
-        for keyword in ["Functievervulling"]:
+        for keyword in ["Functievervulling","vanaf"]:
             functievervulling_instances = page.search_for(keyword)
 
         # Check for 'Functievervulling' keyword instances
