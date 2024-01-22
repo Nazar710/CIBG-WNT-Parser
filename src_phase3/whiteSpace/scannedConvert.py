@@ -11,7 +11,7 @@ class SearchablePDFConverter:
         self.tesseract_cmd_path = tesseract_cmd_path
 
     def validate_paths(self):
-        if(sys.platform.startswith("linux")):
+        if(sys.platform.startswith("linux") or sys.platform.startswith("darwin")):
             pass 
         else:
 
@@ -40,7 +40,7 @@ class SearchablePDFConverter:
 
     def convert_to_searchable_pdf(self, font_size=25, x_threshold=200, y_threshold=200):
         
-        if(sys.platform.startswith('linux')):
+        if(sys.platform.startswith('linux') or sys.platform.startswith("darwin")):
             pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd_path
         self.validate_paths()
 
@@ -68,7 +68,7 @@ class SearchablePDFConverter:
         return pdf_writer
 
     def convert_to_searchable_pdf_page(self, page_number, font_size=5, x_threshold=150, y_threshold=10):
-        if(sys.platform.startswith("linux")):
+        if(sys.platform.startswith("linux") or sys.platform.startswith("darwin")):
             pass 
         else:
             pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd_path

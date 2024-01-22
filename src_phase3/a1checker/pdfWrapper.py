@@ -90,7 +90,7 @@ class PDF_wrapper:
 
         return unused_pages
     
-    def has1ATable(self) -> list[int]:
+    def has1ATable(self):
         has1A = False 
         for page in self._pages:
             if(page.has_1a_table):
