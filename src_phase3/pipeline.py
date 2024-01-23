@@ -16,7 +16,10 @@ import pytesseract
 
 
 def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper,is_ocr:bool = False) -> None:
-    #whitespace tables
+    """
+    whitespace tables
+    """
+    #
 
     original_page = pagenumber
     if(is_ocr):
