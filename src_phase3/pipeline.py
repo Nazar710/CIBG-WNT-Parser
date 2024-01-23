@@ -56,50 +56,55 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
     wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
 
     for wrappedPDF in tqdm(wrappedPdfs):
-        pdf_path = wrappedPDF.file_path
-        candidate_finder = speedy_candidates.candidates(keywords)
-        #candidate pages 
-        candidate_pages = candidate_finder.get_candidates(pdf_path,hide_progress_bar=hidden_progress_bar)
+        try:
 
-        for pagenumber in candidate_pages:     
-            #exact match 
-            keyword_match_tables,exact_match_tables = matcher.get_tables(pdf_path=pdf_path,page_number=pagenumber)
-            
-            if len(exact_match_tables)>0:
-                # get the largest table from the list of exact matching tables
-                max_table = exact_match_tables[0]
-                for table in exact_match_tables:
-                    if table.size > max_table.size:
-                        max_table = table
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact matcher",tables=max_table)
-            elif len(keyword_match_tables)>0:
-                # get the largest table from the list of keyword matching tables
-                max_table = keyword_match_tables[0]
-                for table in keyword_match_tables:
-                    if table.size > max_table.size:
-                        max_table = table
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="keyword matcher",tables=max_table)
-            else: #not exact match 
-                try:
-                    whiteSpace(pdf_path,pagenumber,wrappedPDF)
-                except:
-                    pass
+            pdf_path = wrappedPDF.file_path
+            candidate_finder = speedy_candidates.candidates(keywords)
+            #candidate pages 
+            candidate_pages = candidate_finder.get_candidates(pdf_path,hide_progress_bar=hidden_progress_bar)
 
-        if(not wrappedPDF.has1ATable()):
-            
-            for pagenum in tqdm(candidate_finder.needsOCR(pdf_path,hidden_progress_bar),ascii=True,desc="OCR"):
-                # Create an instance of SearchablePDFConverter
-                pdf_converter = scannedConvert.SearchablePDFConverter(pdf_path, tesseract_cmd_path)
-
-                # Example 2: Convert a specific page of the PDF to a searchable PDF with post-processing
-                searchable_pdf_page = pdf_converter.convert_to_searchable_pdf_page(pagenum)
-
-                # Save the output searchable PDF for the specific page to a file
-                searchable_pdf_page_output_path = f'tempSearchable.pdf'
-                searchable_pdf_page.save(searchable_pdf_page_output_path)
-                whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF,is_ocr=True)
+            for pagenumber in candidate_pages:     
+                #exact match 
+                keyword_match_tables,exact_match_tables = matcher.get_tables(pdf_path=pdf_path,page_number=pagenumber)
                 
-    for pdf in tqdm(wrappedPdfs):
+                if len(exact_match_tables)>0:
+                    # get the largest table from the list of exact matching tables
+                    max_table = exact_match_tables[0]
+                    for table in exact_match_tables:
+                        if table.size > max_table.size:
+                            max_table = table
+                    wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact matcher",tables=max_table)
+                elif len(keyword_match_tables)>0:
+                    # get the largest table from the list of keyword matching tables
+                    max_table = keyword_match_tables[0]
+                    for table in keyword_match_tables:
+                        if table.size > max_table.size:
+                            max_table = table
+                    wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="keyword matcher",tables=max_table)
+                else: #not exact match 
+                    try:
+                        whiteSpace(pdf_path,pagenumber,wrappedPDF)
+                    except:
+                        pass
+
+            if(not wrappedPDF.has1ATable()):
+                
+                for pagenum in tqdm(candidate_finder.needsOCR(pdf_path,hidden_progress_bar),ascii=True,desc="OCR"):
+                    # Create an instance of SearchablePDFConverter
+                    pdf_converter = scannedConvert.SearchablePDFConverter(pdf_path, tesseract_cmd_path)
+
+                    # Example 2: Convert a specific page of the PDF to a searchable PDF with post-processing
+                    searchable_pdf_page = pdf_converter.convert_to_searchable_pdf_page(pagenum)
+
+                    # Save the output searchable PDF for the specific page to a file
+                    searchable_pdf_page_output_path = f'tempSearchable.pdf'
+                    searchable_pdf_page.save(searchable_pdf_page_output_path)
+                    whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF,is_ocr=True)
+        except:
+            pass
+
+    #for pdf in tqdm(wrappedPdfs):
+        pdf = wrappedPDF
         for page in pdf.pages:
             if page.has_1a_table:
                 if type(page._tables) is list:
