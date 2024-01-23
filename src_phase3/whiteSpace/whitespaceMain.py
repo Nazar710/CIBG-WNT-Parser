@@ -11,7 +11,7 @@ class PDFProcessor:
         try:
             target_page = int(target_page)
         except ValueError:
-            print(f"Invalid 'target_page' value: {target_page}")
+            #print(f"Invalid 'target_page' value: {target_page}")
             return  # Exit the method if the value is invalid
 
         if pdf_path and names:
@@ -24,7 +24,7 @@ class PDFProcessor:
                 'result_list': result_list
             })
         else:
-            print("Invalid input values.")
+            #print("Invalid input values.")
 
     def return_results(self) -> list[pd.DataFrame]:
         """
@@ -56,25 +56,25 @@ class PDFProcessor:
         #print(self.results)
         
         for result in self.results:
-            print(f"Results for PDF: {result['pdf_path']}")
+            #print(f"Results for PDF: {result['pdf_path']}")
             for name, result_data in zip(result['names'], result['result_list']):
-                print(f"Name: {result_data[0]}")
-                print(f"Bezoldiging: {result_data[1]}")
-                print(f"Functie: {result_data[2]}")
-                print(f"functievervullingString: {result_data[3]}")
-                print(f"Dienstverband : {result_data[4]}")
-                print(f"Dienstbetrekking: {result_data[5]}")
-                print(f"Beloning: {result_data[6]}")
-                print(f"Beloningen: {result_data[7]}")
-                print(f"Subtotaal: {result_data[8]}")
-                print(f"Bezoldigingsmaximum: {result_data[9]}")
-                print(f"Onverschuldigd: {result_data[10]}")
-                print(f"Overschrijding: {result_data[11]}")
-                print(f"Toelichting: {result_data[12]}")
+                # print(f"Name: {result_data[0]}")
+                # print(f"Bezoldiging: {result_data[1]}")
+                # print(f"Functie: {result_data[2]}")
+                # print(f"functievervullingString: {result_data[3]}")
+                # print(f"Dienstverband : {result_data[4]}")
+                # print(f"Dienstbetrekking: {result_data[5]}")
+                # print(f"Beloning: {result_data[6]}")
+                # print(f"Beloningen: {result_data[7]}")
+                # print(f"Subtotaal: {result_data[8]}")
+                # print(f"Bezoldigingsmaximum: {result_data[9]}")
+                # print(f"Onverschuldigd: {result_data[10]}")
+                # print(f"Overschrijding: {result_data[11]}")
+                # print(f"Toelichting: {result_data[12]}")
 
 
-                print("N-------------------------------------------------N")
-
+                # print("N-------------------------------------------------N")
+                pass
 
 if __name__ == "__main__":
     

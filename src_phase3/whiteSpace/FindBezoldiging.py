@@ -22,10 +22,10 @@ def FinderAlgorithm(pdf_path, names, target_page):
                 totaal_instances = page.search_for(keyword)            
             elif "Totale" in keyword:
                 totale_instances = page.search_for(keyword)
-                print(totale_instances) 
+                #print(totale_instances) 
             elif " Bezoldiging " in keyword:
                 bezoldiging_instances = page.search_for(keyword)
-                print(bezoldiging_instances) 
+                #print(bezoldiging_instances) 
 
         # Now max_y contains the updated maximum y-coordinate based on the conditions
 
@@ -257,7 +257,8 @@ def FinderAlgorithm(pdf_path, names, target_page):
             try:
                 return float(numeric_text)
             except ValueError:
-                print(f"Error converting numeric text to number: {numeric_text}")
+                #print(f"Error converting numeric text to number: {numeric_text}")
+                pass
         return None
 
     pdf_document = fitz.open(pdf_path)
@@ -268,7 +269,8 @@ def FinderAlgorithm(pdf_path, names, target_page):
     salary_keywords = [" Totaal Bezoldiging ", " Totale Bezoldiging ", " Bezoldiging ", " Totaal ", " Totale "]
 
     if not (0 <= target_page < pdf_document.page_count):
-        print(f"Invalid target_page value. It should be in the range [0, {pdf_document.page_count - 1}]")
+        #print(f"Invalid target_page value. It should be in the range [0, {pdf_document.page_count - 1}]")
+        
         target_page = 0
 
     page = pdf_document[target_page]
@@ -320,10 +322,10 @@ def FinderAlgorithm(pdf_path, names, target_page):
                 text_in_region = extract_text_in_region(name, salary_coordinates)
                 number_in_region = extract_number_from_text(text_in_region)
 
-                print(f"Name: {name}")
-                print(f"Text in Region: {text_in_region}")
-                print(f"Number in Region: {number_in_region}")
-                print("N-------------------------------------------------N")
+                # print(f"Name: {name}")
+                # print(f"Text in Region: {text_in_region}")
+                # print(f"Number in Region: {number_in_region}")
+                # print("N-------------------------------------------------N")
             
             if function_coordinates:
                 functionString = extract_text_in_region(name, function_coordinates)
@@ -368,8 +370,8 @@ def FinderAlgorithm(pdf_path, names, target_page):
                                     toelichtingString))  
             
         else:
-            print(f"{name} not found on page {target_page + 1}")
-
+            #print(f"{name} not found on page {target_page + 1}")
+            pass
     pdf_document.close()
     return result_list
 

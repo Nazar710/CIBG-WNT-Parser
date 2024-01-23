@@ -207,7 +207,7 @@ def extract_data_from_pdf(pdf_path:str, page_number:int,minNumRowsMatched:int) -
     
     
     else:
-        print(f"Invalid page number: {page_number}")
+       ## print(f"Invalid page number: {page_number}")
         return None,None
 
 
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     output_dataframe = extract_data_from_pdf(pdf_path, page_number)
 
 
-    print(output_dataframe)
+    ##print(output_dataframe)
         
     # Save the DataFrame to a CSV file
     output_dataframe.to_csv("output_fileAAA.csv", index=False)

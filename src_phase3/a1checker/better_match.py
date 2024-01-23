@@ -71,12 +71,12 @@ class better_match():
         
         if len(tabs.tables) == 0:
             #if no tables were found, try to find them by aligning text instead
-            print("trying full text strategy")
+            #print("trying full text strategy")
             tabs = page.find_tables(strategy = "text")
             
         #if there was still no table found, return
         if len(tabs.tables) == 0:
-            print("no tables on page")
+            #print("no tables on page")
             return
         
         #iterate over each table that was found
@@ -93,7 +93,7 @@ class better_match():
                 text_instances = page.search_for(text, clip = bounds)
                 if len(text_instances) == 0:
                     # if there is no row for functiegegevens or bedragen, return an empty list.
-                    print(text, " was absent:", pdf_path, page_number)
+                    #print(text, " was absent:", pdf_path, page_number)
                     break
         
                 

@@ -55,7 +55,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
 
     wrappedPdfs =[checker.is1aOrNot(pdfobj,treshold,minNumRowsMatched) for pdfobj in Extractor.extractFromPathList(pdf_path_list)]
 
-    for wrappedPDF in wrappedPdfs:
+    for wrappedPDF in tqdm(wrappedPdfs):
         pdf_path = wrappedPDF.file_path
         candidate_finder = speedy_candidates.candidates(keywords)
         #candidate pages 
@@ -104,7 +104,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             if page.has_1a_table:
                 if type(page._tables) is list:
                     for tablenum, table in enumerate(page._tables):
-                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number)+"-"+str(tablenum)+page.csv_method+".csv")
+                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+"-"+str(page.page_number)+"-"+str(tablenum)+"-"+page.csv_method+".csv")
                         if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"):
                             table.transpose().to_csv(csv_path)
                         else:
@@ -112,7 +112,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                         page.csv_path = csv_path
                               
                 else:
-                    csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+page.csv_method+".csv"))
+                    csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + "-" + str(page.page_number)+ "-" +page.csv_method+".csv"))
                     page.csv_path = csv_path
 
                     if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"):

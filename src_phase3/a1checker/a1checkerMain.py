@@ -32,8 +32,8 @@ class extractor():
         """
         with pdfplumber.open(path) as file:
             if(page_nums is not None):
-                print("path: " + path)
-                print("pages ", page_nums)
+                #print("path: " + path)
+                #print("pages ", page_nums)
                 table_pagenum_list = [(pd.DataFrame(table.extract()),page_num) for page_num in page_nums for table in file.pages[page_num].find_tables(table_settings=self.table_settings)] 
             else:
                 table_pagenum_list = [(pd.DataFrame(table.extract()),page.page_number) for page in file.pages for table in page.find_tables(table_settings=self.table_settings)]
@@ -50,7 +50,7 @@ class extractor():
 
         for path,file_name in extractor.recursiveFilePathIterator(folder_name,accepted_formats):
             if(path is None or file_name is None):
-                print("no pdf's found in the folder")
+                #print("no pdf's found in the folder")
                 exit()
 
 
@@ -59,7 +59,7 @@ class extractor():
             pdfsobj_list.append(pdf_obj)
         
         if(len(pdfsobj_list) == 0):
-            print("no pdfs found")
+            #print("no pdfs found")
             exit(0)
             
         return pdfsobj_list
