@@ -80,8 +80,8 @@ class SearchablePDFConverter:
         # Step 2: Perform OCR on the image and create a searchable PDF for the specified page
         pdf_writer = fitz.open()
 
-        # Perform OCR on the image with detailed data
-        ocr_data = pytesseract.image_to_data(image, lang='nld', output_type=pytesseract.Output.DICT)
+        # Perform OCR on the image with detailed data !!!! deleted lang = 'nld'in
+        ocr_data = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)
 
         # Post-process the OCR data to group words that are close in proximity
         grouped_text = self.post_process_text(ocr_data, x_threshold, y_threshold)
