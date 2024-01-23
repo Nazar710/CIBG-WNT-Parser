@@ -3,10 +3,13 @@ from .FindBezoldiging import FinderAlgorithm  # Make sure to import the correct 
 from .nameFind import KeywordFinder
 
 class PDFProcessor:
+    """
+        processor class, given a list of names to look for in a PDF and the page to find it, extract a WNT table.
+    """
     def __init__(self):
         self.results = []
 
-    def process_pdf(self, pdf_path, target_page, names):
+    def process_pdf(self, pdf_path: str, target_page: int, names: list) -> None:
         
         try:
             target_page = int(target_page)
