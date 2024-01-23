@@ -88,15 +88,15 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                         else:
                             table.to_csv(csv_path)
                         page.csv_path = csv_path
-                        
-                            
+                              
                 else:
                     csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
                     page.csv_path = csv_path
-                    if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"):
-                        page._table.transpose().to_csv(csv_path)
+
+                    if not page.csv_method == "better matcher":
+                        page._tables.transpose().to_csv(csv_path)## fix (table ->page._tables
                     else:
-                        page._table.to_csv(csv_path)
+                        page._tables.to_csv(csv_path)## fix (table ->page._tables
                         
     debug_gui = debugger.PDFViewer(wrappedPdfs)
     debug_gui.run()
