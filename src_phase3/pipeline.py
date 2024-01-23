@@ -105,7 +105,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                 if type(page._tables) is list:
                     for tablenum, table in enumerate(page._tables):
                         csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number)+"-"+str(tablenum)+page.csv_method+".csv")
-                        if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"):
+                        if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher" or page.csv_method == "1a checker"):
                             table.transpose().to_csv(csv_path)
                         else:
                             table.to_csv(csv_path)
@@ -115,7 +115,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                     csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+page.csv_method+".csv"))
                     page.csv_path = csv_path
 
-                    if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"):
+                    if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"or page.csv_method == "1a checker"):
                         page._tables.transpose().to_csv(csv_path)## fix (table ->page._tables
                     else:
                         page._tables.to_csv(csv_path)## fix (table ->page._tables
