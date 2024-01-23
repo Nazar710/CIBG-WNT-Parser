@@ -67,7 +67,7 @@ class SearchablePDFConverter:
         # Return the final searchable PDF
         return pdf_writer
 
-    def convert_to_searchable_pdf_page(self, page_number, font_size=5, x_threshold=150, y_threshold=10):
+    def convert_to_searchable_pdf_page(self, page_number, font_size=15, x_threshold=150, y_threshold=10):
         if(sys.platform.startswith("linux") or sys.platform.startswith("darwin")):
             pass 
         else:

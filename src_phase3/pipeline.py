@@ -20,7 +20,7 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper,is_ocr:bool = F
 
     original_page = pagenumber
     if(is_ocr):
-        pagenumber = 0
+        pagenumber = 1
         csv_method = "OCR whitespace"
     else:
         csv_method = "whitespace"
