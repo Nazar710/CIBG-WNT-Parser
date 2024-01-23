@@ -15,8 +15,15 @@ import pytesseract
 
 
 
-def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
+def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper,is_ocr:bool = False) -> None:
     #whitespace tables
+
+    original_page = pagenumber
+    if(is_ocr):
+        pagenumber = 0
+        csv_method = "OCR whitespace"
+    else:
+        csv_method = "whitespace"
 
     keyword_finder = nameFind.KeywordFinder(pdf_path)
     result = keyword_finder.find_keywords_with_context(pagenumber)
@@ -24,13 +31,15 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper) -> None:
     listofnames=result               
     pdf_processor = whitespaceMain.PDFProcessor()
     pdf_processor.process_pdf(pdf_path=pdf_path, target_page=pagenumber, names=listofnames)
+   
+    
     #page_number:int, selectable:bool, scanned:bool, has_1a_table:bool, csv_path:str,csv_method:str,tables:list[pd.DataFrame])
     tables = pdf_processor.return_results()
     
     if(len(tables) > 0):
         #only adds page if it's 1a
-        wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method="white space",tables=tables)
-
+        wrappedPDF.add_page(page_number=original_page,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method=csv_method,tables=tables)
+    
 
 def pipeline(pdf_path_list:list[str], folder_path: str):
     #hyper param
@@ -61,7 +70,10 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             elif len(keyword_match_tables)>0:
                 wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="keyword matcher",tables=keyword_match_tables)
             else: #not exact match 
-                whiteSpace(pdf_path,pagenumber,wrappedPDF)
+                try:
+                    whiteSpace(pdf_path,pagenumber,wrappedPDF)
+                except:
+                    pass
 
         if(not wrappedPDF.has1ATable()):
             
@@ -75,7 +87,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                 # Save the output searchable PDF for the specific page to a file
                 searchable_pdf_page_output_path = f'tempSearchable.pdf'
                 searchable_pdf_page.save(searchable_pdf_page_output_path)
-                whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF)
+                whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF,is_ocr=True)
                 
     for pdf in tqdm(wrappedPdfs):
         for page in pdf.pages:
