@@ -45,36 +45,3 @@ class KeywordFinder:
     def close(self):
         self.doc.close()
 
-# Example usage
-def main():
-    # Read input from CSV file
-    csv_file_path = "test2.csv"
-    output_csv_path = "namesFinder.csv"
-
-    # with open(csv_file_path, newline='') as csvfile:
-    #     reader = csv.DictReader(csvfile)
-
-    #     for row in reader:
-    #         pdf_path = row['FileName']
-    #         page_number_to_search = int(row['Pagenumber'])
-    #         keywords_to_find = ["Bestuurder", "Voorzitter", "lid","Secretaris","Directeur"]
-    #         pdf_path = f"pdfs/{pdf_path}.pdf"
-
-    #         keyword_finder = KeywordFinder(pdf_path)
-    #         result = keyword_finder.find_keywords_with_context(keywords_to_find, page_number_to_search, context_width=15, context_height=15)
-    #         keyword_finder.close()
-
-    #         # Append results to the CSV file with column titles for each row
-    #         with open(output_csv_path, mode='a', newline='') as output_csv:
-    #             fieldnames = ['FileName', 'keyword', 'Name', 'Pagenumber']
-    #             writer = csv.DictWriter(output_csv, fieldnames=fieldnames)
-
-    #             # Write column titles for each row
-    #             if output_csv.tell() == 0:
-    #                 writer.writeheader()
-
-    #             writer.writerows(result)
-    #         print(result)
-
-if __name__ == "__main__":
-    main()

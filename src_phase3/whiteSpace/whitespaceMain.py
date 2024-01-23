@@ -80,19 +80,4 @@ class PDFProcessor:
                 # print("N-------------------------------------------------N")
                 pass
 
-if __name__ == "__main__":
-    
 
-    # Example Usage:
-    
-    pdf_path="DigiMV2020_7FMRR3X2P7_0_05072572_Jaarrekening_6286_Stichting ZGR"
-    pagenumber=30
-    keyword_finder = KeywordFinder(f"pdfs/{pdf_path}.pdf")
-    result = keyword_finder.find_keywords_with_context(pagenumber)
-    keyword_finder.close()
-    listofnames=result               
-
-    pdf_processor = PDFProcessor()
-    pdf_processor.process_pdf(pdf_path=pdf_path, target_page=pagenumber, names=listofnames)
-    pdf_processor.save_results_to_csv(output_csv_path='output_results.csv')
-    pdf_processor.display_results()

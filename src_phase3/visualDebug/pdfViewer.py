@@ -306,17 +306,3 @@ class PDFViewer:
         """Start the GUI loop."""
         self.root.mainloop()
 
-# folder_path = 'dataProcessing/allPDF_1'
-# pdf_files = [f for f in os.listdir(folder_path) if f.endswith('.pdf')]
-# wrappers = []
-# wrapper1 = PDF_wrapper("wnt_not_scanned","src\pipeline\wnt_not_scanned.pdf")
-# wrapper1.add_page(35,True,False,True,'src\pipeline\speedy_candidates_results.csv', "exact match coördinate")
-# wrappers.append(wrapper1)
-# wrapper2 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
-# wrapper2.add_page(34,False,True,True,"src/pipeline/visualDebug/1a_template.xlsx", "ocr")
-# wrappers.append(wrapper2)
-# wrapper3 = PDF_wrapper("wnt_scan","src\pipeline\wnt_scan.pdf")
-# wrapper3.add_page(20,True,True,False,"","Mathias")
-# wrappers.append(wrapper3)
-# viewer = PDFViewer(wrappers)
-# viewer.run()

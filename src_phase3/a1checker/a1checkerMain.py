@@ -176,14 +176,4 @@ class a1checker():
 
 
 
-if __name__ == "__main__":
-    treshold = 0.7
-
-
-    Extractor = extractor()
-    checker = a1checker()
-
-    for pdfobj in Extractor.extract("pdfs"):
-        checker.is1aOrNot(pdfobj,treshold)
-
          

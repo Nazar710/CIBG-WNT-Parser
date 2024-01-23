@@ -211,17 +211,4 @@ def extract_data_from_pdf(pdf_path:str, page_number:int,minNumRowsMatched:int) -
         return None,None
 
 
-
-if __name__ == "__main__":
-
-    # Example usage
-    pdf_path = "DigiMV2021_D378NP2TA9_1_30202982_Overig_18115_Het_Jagerhuis_B.V..pdf"
-    page_number = 1  # Replace with the desired page number
-    output_dataframe = extract_data_from_pdf(pdf_path, page_number)
-
-
-    ##print(output_dataframe)
-        
-    # Save the DataFrame to a CSV file
-    output_dataframe.to_csv("output_fileAAA.csv", index=False)
     
