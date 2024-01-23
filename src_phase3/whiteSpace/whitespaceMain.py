@@ -25,6 +25,7 @@ class PDFProcessor:
             })
         else:
             #print("Invalid input values.")
+            pass
 
     def return_results(self) -> list[pd.DataFrame]:
         """
