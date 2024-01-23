@@ -21,6 +21,7 @@ class better_match():
         "-/- Onverschuldigd betaald en nog niet terugontvangen bedrag",
         "Bezoldiging",
         "Het bedrag van de overschrijding en de reden waarom de overschrijding al dan niet is toegestaan",
+        "reden waarom de overschrijding al dan niet is toegestaan",
         "Toelichting op de vordering wegens onverschuldigde betaling"
         ]
         self.data_points = [
@@ -132,12 +133,12 @@ class better_match():
             x0_first_functie = functie_df['x0'].min()
 
             #create our first column, before both the first name and the first functie data point
-            column_coords.append(min(x0_first_name,x0_first_functie)-10)
+            column_coords.append(min(x0_first_name,x0_first_functie)-5)
         
 
-            name_columns = self.guess_columns_name(words_df, column_coords[-1],10)
+            name_columns = self.guess_columns_name(words_df, column_coords[-1],5)
             
-            functie_columns = self.guess_columns_functiegegevens(words_df,column_coords[-1],10)
+            functie_columns = self.guess_columns_functiegegevens(words_df,column_coords[-1],5)
             
             if column_strategy == "name":
                 column_coords = column_coords + name_columns

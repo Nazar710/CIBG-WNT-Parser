@@ -43,10 +43,10 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper,is_ocr:bool = F
 
 def pipeline(pdf_path_list:list[str], folder_path: str):
     #hyper param
-    treshold = 0.7 
+    treshold = 0.9 
     keywords = ["bezoldiging", "wnt"]
     minNumRowsMatched = 10
-    tesseract_cmd_path = r'"C:/Program Files/Tesseract-OCR/tesseract.exe"'
+    tesseract_cmd_path = r"C:/Program Files/Tesseract-OCR/tesseract.exe"
     hidden_progress_bar = True
         
     Extractor = a1checkerMain.extractor()
@@ -66,9 +66,19 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             keyword_match_tables,exact_match_tables = matcher.get_tables(pdf_path=pdf_path,page_number=pagenumber)
             
             if len(exact_match_tables)>0:
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact matcher",tables=exact_match_tables)
+                # get the largest table from the list of exact matching tables
+                max_table = exact_match_tables[0]
+                for table in exact_match_tables:
+                    if table.size > max_table.size:
+                        max_table = table
+                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact matcher",tables=max_table)
             elif len(keyword_match_tables)>0:
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="keyword matcher",tables=keyword_match_tables)
+                # get the largest table from the list of keyword matching tables
+                max_table = keyword_match_tables[0]
+                for table in keyword_match_tables:
+                    if table.size > max_table.size:
+                        max_table = table
+                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="keyword matcher",tables=max_table)
             else: #not exact match 
                 try:
                     whiteSpace(pdf_path,pagenumber,wrappedPDF)
@@ -105,7 +115,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                     csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
                     page.csv_path = csv_path
 
-                    if not page.csv_method == "better matcher":
+                    if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"):
                         page._tables.transpose().to_csv(csv_path)## fix (table ->page._tables
                     else:
                         page._tables.to_csv(csv_path)## fix (table ->page._tables
