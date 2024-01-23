@@ -10,7 +10,7 @@ class KeywordFinder:
         keywords = ["Bestuurder", "Voorzitter", "lid","Secretaris","Directeur"]
         unique_names = set()
         results = []
-        page = self.doc[page_number-1]## page number starts from 1
+        page = self.doc[page_number-1] ## page number starts from 1
         words = page.get_text("words")
 
         for keyword in keywords:

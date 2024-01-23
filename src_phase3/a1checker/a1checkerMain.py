@@ -168,7 +168,7 @@ class a1checker():
                 wrappedPDFobj.add_page(page_number=pagenum,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method=method_name,tables=table)
             else:
                 #has not a1
-                wrappedPDFobj.add_page(page_number=pagenum,selectable=True,scanned=False,has_1a_table=False,csv_path="",csv_method=method_name,tables=table)
+                wrappedPDFobj.add_page(page_number=pagenum,selectable=True,scanned=False,has_1a_table=False,csv_path="",csv_method=method_name,tables=[])
                     
         #check what pages are selectable
         return wrappedPDFobj
