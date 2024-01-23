@@ -4,6 +4,9 @@ import os
 import csv
 import os
 
+
+
+
 def get_list_labeled_CSV(file_path):
     # Read the CSV file into a pandas DataFrame with 'latin1' encoding
     df = pd.read_csv(file_path, header=None, encoding='latin1')
@@ -15,6 +18,8 @@ def get_list_labeled_CSV(file_path):
     for index, row in df.iterrows():
         # Get the feature name from the first column (index 0)
         feature_name = row.iloc[0]
+        feature_name = modify_feature_name(feature_name)
+
 
         # Get the data points for the current feature (from index 1 to the end)
         data_points = row.iloc[1:].tolist()
@@ -49,6 +54,38 @@ def get_list_labeled_CSV(file_path):
 #     print(entry)
 
 
+def modify_feature_name(original_feature_name):
+    # Add more if statements for additional conditions
+
+
+    if any(word.lower() == "functievervulling" for word in original_feature_name.lower().split()):
+        return "Aanvang en einde functievervulling in "    
+    elif "Functie" in original_feature_name:
+        return "Functiegegevens"    
+    elif "bedragen" in original_feature_name:
+        return "bedragen"     
+    elif "dienstverband" in original_feature_name:
+        return "Omvang dienstverband (als deeltijdfactor in fte)"   
+    elif "Dienstbetrekking" in original_feature_name:
+        return "Dienstbetrekking?"
+    elif any(word.lower() == "Beloning" for word in original_feature_name.lower().split()):
+        return "Beloning plus belastbare onkostenvergoedingen"   
+    elif any(word.lower() == "Beloningen" for word in original_feature_name.lower().split()):
+        return "Beloningen betaalbaar op termijn"
+    elif "Subtotaal" in original_feature_name:
+        return "Subtotaal"                  
+    elif "bezoldigingsmaximum" in original_feature_name:
+        return "Individueel toepasselijke bezoldigingsmaximum"
+    elif "Bezoldiging" in original_feature_name:
+        return "Bezoldiging"     
+    elif "Onverschuldigd" in original_feature_name:
+        return "-/- Onverschuldigd betaald en nog niet terugontvangen bedrag"   
+    elif "overschrijding" in original_feature_name:
+        return "Het bedrag van de overschrijding en de reden waarom de overschrijding al dan niet is toegestaan"       
+    elif "onverschuldigde" in original_feature_name:
+        return "Toelichting op de vordering wegens onverschuldigde betaling"   
+    else:
+        return original_feature_name
 
 def get_list_predicted_csv(file_path):
     # Read the CSV file into a pandas DataFrame with 'latin1' encoding
@@ -60,7 +97,10 @@ def get_list_predicted_csv(file_path):
     # Iterate through each column in the DataFrame
     for column in df.columns:
         # Get the feature name from the column header
-        feature_name = column
+        original_feature_name = column
+
+        # Modify the feature name based on the conditions in the separate method
+        feature_name = modify_feature_name(original_feature_name)
 
         # Get the data points for the current feature
         data_points = df[column].tolist()
@@ -72,10 +112,11 @@ def get_list_predicted_csv(file_path):
         result_list.append({
             'P FeatureName': feature_name,
             'P Data Points': data_points,
-            'TotalPredictedDataPoints': total_data_points
+            'TotalDataPoints': total_data_points
         })
 
     return result_list
+
 
 # # Example usage:
 # file_path = 'output.csv'
@@ -135,7 +176,13 @@ def compare_csv_features(labeled_file_path, predicted_file_path):
                     else:
                         false_positive_data_points_count += 1
                         false_positive_data_points.append(predicted_data_point_str)
-
+        else:
+            print("")
+            print("===================!!!!!!!!!!!!!=============================")
+            print("FeatureName in Predicted CSV Not found in labeled CSV: ",feature_name)     
+            print("Check the csv Please")     
+            print("===================!!!!!!!!!!!!!=============================")    
+            print("")     
     # Calculate false negative data points
     false_negative_data_points_count = total_data_points_in_labeled - true_positive_data_points_count - partially_true_data_points_count
     # New list for false negative data points
@@ -199,7 +246,7 @@ def compare_csv_features_for_folders(folder1_path, folder2_path, output_csv_path
     total_true_files = 0  # Counter for files with total_data_points_in_labeled == true_positive_data_points_count
     partially_predicted_files = 0
     false_predicted_files = 0
-    total_files=len(folder1_files)
+    total_files=len(folder2_files)
 
     # Iterate through files in the first folder
     for file1_name in folder1_files:
@@ -237,6 +284,7 @@ def compare_csv_features_for_folders(folder1_path, folder2_path, output_csv_path
                 false_predicted_files += 1
         else:
             false_predicted_files += 1
+            print("Table in labeled folder Not Found in output folder",file1_name)
 
 
     # Calculate overall precision and recall
@@ -283,7 +331,23 @@ def compare_csv_features_for_folders(folder1_path, folder2_path, output_csv_path
     print(f"\nOverall metrics saved to '{output_csv_path}'.")
 
 
-# Example usage:
+#========================================================================================================
+
+# TO USE HERE:
+#folder1_path : is the folder with csv from the pipeline
+#folder2_path = is the folder with csv from the labeled tables
+
+#requirements
+#1. features names in output folder in coulmns (each coulmn is a feature name)
+#2. features names in labeled folder in rows (each row is a feature name)
+#3. In order to compare 2 csv they has to have the SAME NAME otherwise it will be a False Table
+#4. Files are in CSV format
+#5. if something is missing (feature name or datapoint) it will be printed to make sure to check 
+
+
 folder1_path = 'output' #the output folder
 folder2_path = 'labeled' #the labeled folder
 compare_csv_features_for_folders(folder1_path, folder2_path)
+
+
+#========================================================================================================
