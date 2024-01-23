@@ -11,6 +11,7 @@ from visualDebug.visualMain import PDFProcessorApp
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import visualDebug.pdfViewer as debugger
 import os
+import pytesseract
 
 
 
@@ -36,7 +37,7 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
     treshold = 0.7 
     keywords = ["bezoldiging", "wnt"]
     minNumRowsMatched = 10
-    tesseract_cmd_path = r'D:/CODING/Tesseract-OCR/tesseract.exe'
+    tesseract_cmd_path = r'"C:/Program Files/Tesseract-OCR/tesseract.exe"'
     hidden_progress_bar = True
         
     Extractor = a1checkerMain.extractor()
@@ -53,10 +54,12 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
 
         for pagenumber in candidate_pages:     
             #exact match 
-            match_tables = matcher.get_tables(pdf_path=pdf_path,page_number=pagenumber)
+            keyword_match_tables,exact_match_tables = matcher.get_tables(pdf_path=pdf_path,page_number=pagenumber)
             
-            if len(match_tables)>0:
-                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="better matcher",tables=match_tables)
+            if len(exact_match_tables)>0:
+                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="exact matcher",tables=exact_match_tables)
+            elif len(keyword_match_tables)>0:
+                wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="keyword matcher",tables=keyword_match_tables)
             else: #not exact match 
                 whiteSpace(pdf_path,pagenumber,wrappedPDF)
 
@@ -79,17 +82,17 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
             if page.has_1a_table:
                 if type(page._tables) is list:
                     for tablenum, table in enumerate(page._tables):
-                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number)+str(tablenum)+".csv")
-                        if not page.csv_method == "better matcher":
+                        csv_path = os.path.join(folder_path, pdf.file_name[:-4]+str(page.page_number)+"-"str(tablenum)+".csv")
+                        if not (page.csv_method == "exact matcher" or page.csv_method == "keyword matcher"):
                             table.transpose().to_csv(csv_path)
                         else:
                             table.to_csv(csv_path)
                         page.csv_path = csv_path
-                        
-                            
+                              
                 else:
                     csv_path = os.path.join(folder_path, str(pdf.file_name[:-4] + str(page.page_number)+".csv"))
                     page.csv_path = csv_path
+
                     if not page.csv_method == "better matcher":
                         page._tables.transpose().to_csv(csv_path)## fix (table ->page._tables
                     else:

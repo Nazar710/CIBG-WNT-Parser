@@ -8,6 +8,21 @@ import pdfplumber
 class better_match():
     def __init__(self):
         self.search_texts = ["Functiegegevens", "bedragen x € 1"]
+        self.exact_data_points = [
+        "Bedragen x € 1",
+        "Functiegegevens",
+        "Aanvang en einde functievervulling in 2023",
+        "Omvang dienstverband (als deeltijdfactor in fte)",
+        "Dienstbetrekking",
+        "Beloning plus belastbare onkostenvergoedingen",
+        "Beloningen betaalbaar op termijn",
+        "Subtotaal",
+        "Individueel toepasselijke bezoldigingsmaximum",
+        "-/- Onverschuldigd betaald en nog niet terugontvangen bedrag",
+        "Bezoldiging",
+        "Het bedrag van de overschrijding en de reden waarom de overschrijding al dan niet is toegestaan",
+        "Toelichting op de vordering wegens onverschuldigde betaling"
+        ]
         self.data_points = [
         "bedragen", 
         "gegevens",
@@ -23,18 +38,25 @@ class better_match():
         "Onverschuldigd","terugontvangen"
         "Bezoldiging",
         "overschrijding", "toegestaan"
-        "Toelichting op de vordering wegens onverschuldigde betaling", "totale"
+        "Toelichting op de vordering wegens onverschuldigde betaling", "totale", "totaal"
         ]
     def get_tables(self,pdf_path:str, page_number:int, y_tolerance = 5,column_strategy = "name",min_rows = 10, min_cols = 2):
-        
+        """finds tables by using pymupdf's table extractor and giving it columns inferred from either the names following
+        the bedragen line or the functie following the functiegegevens line. Outputs a list of dfs filtered by keywords and a list of dfs
+        filtered by exactly matching the 1a table"""
         dfs_linestrat = self.extract_tables_from_page(pdf_path,page_number,y_tolerance,column_strategy,horizontal_strategy="lines")
         dfs_textstrat = self.extract_tables_from_page(pdf_path,page_number,y_tolerance,column_strategy,horizontal_strategy="text")
         #filter out irrelevant rows based on keywords
-        processed_dfs = []
-        processed_dfs = processed_dfs + self.process_dfs(dfs_linestrat)
-        processed_dfs = processed_dfs + self.process_dfs(dfs_textstrat)
-        processed_dfs = [df for df in processed_dfs if len(df) >= min_rows and df.shape[1] >= min_cols]
-        return processed_dfs
+        keywords_dfs = []
+        keywords_dfs = keywords_dfs + self.process_dfs(dfs_linestrat)
+        keywords_dfs = keywords_dfs + self.process_dfs(dfs_textstrat)
+        keywords_dfs = [df for df in keywords_dfs if len(df) >= min_rows and df.shape[1] >= min_cols]
+        
+        exact_dfs = []
+        exact_dfs = exact_dfs + self.filter_exact_dfs(dfs_linestrat)
+        exact_dfs = exact_dfs + self.filter_exact_dfs(dfs_textstrat)
+        exact_dfs = [df for df in exact_dfs if len(df) >= min_rows and df.shape[1] >= min_cols]
+        return keywords_dfs, exact_dfs
     
     def extract_tables_from_page(self,pdf_path:str, page_number:int, y_tolerance = 5,column_strategy = "name",horizontal_strategy = "lines") -> tuple[pd.DataFrame,bool]:
         # read pdf document
@@ -198,7 +220,22 @@ class better_match():
             filtered_dfs.append(filtered_df)
             
         return filtered_dfs
-        
+    
+    def filter_exact_dfs(self, dfs):
+        filtered_dfs = []  # List to store filtered DataFrames
+
+        for df in dfs:
+            # Initialize a Series of False values
+            mask = pd.Series([False] * len(df))
+            first_col_lower = df.iloc[:, 0].str.lower()
+            # Update the mask if the first column contains any of the strings in self.data_points
+            for string in self.exact_data_points:
+                mask = mask | (first_col_lower == string.lower())
+            # Filter the DataFrame using the mask
+            filtered_df = df[mask]
+            filtered_dfs.append(filtered_df)
+            
+        return filtered_dfs
 if __name__ == "__main__":
     # Example usage
         pdf_path = "src_phase3/pdfs/testTables.pdf"
