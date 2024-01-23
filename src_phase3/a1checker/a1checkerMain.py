@@ -9,6 +9,9 @@ from .pdfWrapper import PDF_wrapper
 
 
 class pdf():
+    """
+    small temporary wrapper
+    """
     def __init__(self,path:str,file_name:str,tables:list[tuple[int,pd.DataFrame]]=None) -> None:
         self.path = path 
         self.file_name = file_name
@@ -22,6 +25,9 @@ class pdf():
 
 
 class extractor():
+    """
+    class for extracting tables from files and iterating over folders
+    """
     def __init__(self,table_settings:dict={}) -> None:
         self.table_settings = table_settings
         
@@ -42,7 +48,7 @@ class extractor():
             # page_nums = [table_and_page[1] for table_and_page in table_pagenum_list]
             return table_pagenum_list
 
-    def extract(self,folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]):
+    def extract(self,folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> list:
         """
         goes over all the pdfs in the specified folder and returns pdf objects
         """
@@ -64,7 +70,10 @@ class extractor():
             
         return pdfsobj_list
 
-    def extractFromPathList(self,paths:list[str]):
+    def extractFromPathList(self,paths:list[str]) -> list:
+        """
+        gets all the tables as pdf objects from a list of files to pdfs
+        """
         pdfsobj_list = []
 
         for path in paths:
@@ -104,6 +113,10 @@ class extractor():
             yield None, None 
 
 class a1checker():
+    """
+    checks if a table is the perfect 1a table.
+    
+    """
     def __init__(self) -> None:
         self.data_points = [
         "Naam",
