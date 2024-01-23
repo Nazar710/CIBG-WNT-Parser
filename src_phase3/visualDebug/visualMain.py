@@ -7,6 +7,8 @@ import os
 import shutil
 
 class PDFProcessorApp:
+    """Main GUI application. Lets you enter a folder destination and the paths to pdfs you want to extract from. From here, it can call the pipeline.
+    """
     def __init__(self, root,pipeline_Func):
         self.root = root
         self.init_gui()
@@ -165,7 +167,6 @@ class PDFProcessorApp:
         
     def extract_files(self):
         path_list = self.get_files()
-        """TODO send this list to sander's method to get it started"""
         self.pipeline_Func(path_list,folder_path = self.path_var.get())
 
 

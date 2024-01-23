@@ -16,6 +16,8 @@ import pytesseract
 
 
 def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper,is_ocr:bool = False) -> None:
+    """processes a pdf page by looking for whitespace tables.
+    """
     #whitespace tables
 
     original_page = pagenumber
@@ -41,7 +43,11 @@ def whiteSpace(pdf_path:str,pagenumber:int,wrappedPDF:pdfWrapper,is_ocr:bool = F
         wrappedPDF.add_page(page_number=original_page,selectable=True,scanned=False,has_1a_table=len(tables) > 0,csv_path="",csv_method=csv_method,tables=tables)
     
 
-def pipeline(pdf_path_list:list[str], folder_path: str):
+def pipeline(pdf_path_list:list[str], folder_path: str) -> None:
+    """ Given a list of pdf paths and a folder path, find the potentially relevant pages and sequentially give them to different extraction methods.
+    If an extraction method returns a viable table, save the table in the designated output folder. Otherwise, feed it to the next method. Once all
+    PDFs have been processed, start up the visual debugger.
+    """
     #hyper param
     treshold = 0.9 
     keywords = ["bezoldiging", "wnt"]
@@ -81,25 +87,25 @@ def pipeline(pdf_path_list:list[str], folder_path: str):
                         if table.size > max_table.size:
                             max_table = table
                     wrappedPDF.add_page(page_number=pagenumber,selectable=True,scanned=False,has_1a_table=True,csv_path="",csv_method="keyword matcher",tables=max_table)
-                else: #not exact match 
-                    try:
-                        whiteSpace(pdf_path,pagenumber,wrappedPDF)
-                    except:
-                        pass
+                # else: #not exact match 
+                #     try:
+                #         whiteSpace(pdf_path,pagenumber,wrappedPDF)
+                #     except:
+                #         pass
 
-            if(not wrappedPDF.has1ATable()):
+            # if(not wrappedPDF.has1ATable()):
                 
-                for pagenum in tqdm(candidate_finder.needsOCR(pdf_path,hidden_progress_bar),ascii=True,desc="OCR"):
-                    # Create an instance of SearchablePDFConverter
-                    pdf_converter = scannedConvert.SearchablePDFConverter(pdf_path, tesseract_cmd_path)
+            #     for pagenum in tqdm(candidate_finder.needsOCR(pdf_path,hidden_progress_bar),ascii=True,desc="OCR"):
+            #         # Create an instance of SearchablePDFConverter
+            #         pdf_converter = scannedConvert.SearchablePDFConverter(pdf_path, tesseract_cmd_path)
 
-                    # Example 2: Convert a specific page of the PDF to a searchable PDF with post-processing
-                    searchable_pdf_page = pdf_converter.convert_to_searchable_pdf_page(pagenum)
+            #         # Example 2: Convert a specific page of the PDF to a searchable PDF with post-processing
+            #         searchable_pdf_page = pdf_converter.convert_to_searchable_pdf_page(pagenum)
 
-                    # Save the output searchable PDF for the specific page to a file
-                    searchable_pdf_page_output_path = f'tempSearchable.pdf'
-                    searchable_pdf_page.save(searchable_pdf_page_output_path)
-                    whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF,is_ocr=True)
+            #         # Save the output searchable PDF for the specific page to a file
+            #         searchable_pdf_page_output_path = f'tempSearchable.pdf'
+            #         searchable_pdf_page.save(searchable_pdf_page_output_path)
+            #         whiteSpace("tempSearchable.pdf",pagenum,wrappedPDF,is_ocr=True)
         except:
             pass
 

@@ -2,11 +2,13 @@ import csv
 import fitz
 
 class KeywordFinder:
-    def __init__(self, pdf_path):
+    """Looks for keywords that might appear after function, infers name from the location above
+    """
+    def __init__(self, pdf_path: str):
         self.pdf_path = pdf_path
         self.doc = fitz.open(pdf_path)
 
-    def find_keywords_with_context(self, page_number, context_width=15, context_height=15):
+    def find_keywords_with_context(self, page_number: int, context_width:float=15, context_height:float=15) -> list:
         keywords = ["Bestuurder", "Voorzitter", "lid","Secretaris","Directeur"]
         unique_names = set()
         results = []
@@ -35,7 +37,7 @@ class KeywordFinder:
                         )
         return results
 
-    def get_text_in_region(self, page, region):
+    def get_text_in_region(self, page: int, region: any) -> tuple[str, list, dict]:
         # Extract text in the specified region
         text = page.get_text("text", clip=region)
         return text.strip()

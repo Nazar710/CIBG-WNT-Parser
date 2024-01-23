@@ -1,11 +1,9 @@
-# CIBG_WNT_Parser
+linux requirments and setup:
+sudo apt-get install tesseract-ocr-nld
 
-<b> General current structure locating data</b>
+#full setup
+conda create -n cibg
+conda activate cibg
+conda install pip 
 
-1) hard classifier for CBG (rule based)
-2) Table extraction + table classfier (if fail move to 3)
-3) free form text 
-
-
-<b> Notes </b>
-The parse is meant to be a pipeline.
+pip install -r requirements.txt

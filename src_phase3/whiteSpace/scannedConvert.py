@@ -6,11 +6,12 @@ import os
 import sys
 
 class SearchablePDFConverter:
+    """this class converts scanned pages of PDF documents into selectable PDFS while maintaining similar spacing"""
     def __init__(self, input_pdf_path, tesseract_cmd_path):
         self.input_pdf_path = input_pdf_path
         self.tesseract_cmd_path = tesseract_cmd_path
 
-    def validate_paths(self):
+    def validate_paths(self) -> None:
         if(sys.platform.startswith("linux") or sys.platform.startswith("darwin")):
             pass 
         else:
@@ -21,7 +22,7 @@ class SearchablePDFConverter:
             if not os.path.isfile(self.tesseract_cmd_path):
                 raise FileNotFoundError(f"Tesseract executable not found at: {self.tesseract_cmd_path}")
 
-    def post_process_text(self, ocr_data, x_threshold=5, y_threshold=5):
+    def post_process_text(self, ocr_data: any, x_threshold:float=5, y_threshold:float=5) -> list:
         grouped_text = []
 
         for (x, y, w, h, text) in zip(
@@ -38,7 +39,7 @@ class SearchablePDFConverter:
 
         return grouped_text
 
-    def convert_to_searchable_pdf(self, font_size=25, x_threshold=200, y_threshold=200):
+    def convert_to_searchable_pdf(self, font_size:float=25, x_threshold:float=200, y_threshold:float=200) -> fitz.Document:
         
         if(sys.platform.startswith('linux') or sys.platform.startswith("darwin")):
             pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd_path
@@ -67,7 +68,7 @@ class SearchablePDFConverter:
         # Return the final searchable PDF
         return pdf_writer
 
-    def convert_to_searchable_pdf_page(self, page_number, font_size=15, x_threshold=150, y_threshold=10):
+    def convert_to_searchable_pdf_page(self, page_number: int, font_size: int=15, x_threshold:float=150, y_threshold:float=10) -> fitz.Document:
         if(sys.platform.startswith("linux") or sys.platform.startswith("darwin")):
             pass 
         else:

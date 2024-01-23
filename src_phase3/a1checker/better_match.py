@@ -6,6 +6,10 @@ import matplotlib as plt
 import pdfplumber
                 
 class better_match():
+    """
+    This class is a table extractor for PDF files. Given the pdf's path and its page, it matches rows in potential tables with those of the 1a template table.
+    It then returns a list of all tables it could find that are close enough to the 1a template.
+    """
     def __init__(self):
         self.search_texts = ["Functiegegevens", "bedragen x € 1"]
         self.exact_data_points = [
@@ -41,10 +45,10 @@ class better_match():
         "overschrijding", "toegestaan"
         "Toelichting op de vordering wegens onverschuldigde betaling", "totale", "totaal"
         ]
-    def get_tables(self,pdf_path:str, page_number:int, y_tolerance = 5,column_strategy = "name",min_rows = 10, min_cols = 2):
+    def get_tables(self,pdf_path:str, page_number:int, y_tolerance: int = 5,column_strategy: str = "name",min_rows: int = 10, min_cols: int = 2) -> tuple[list,list]: 
         """finds tables by using pymupdf's table extractor and giving it columns inferred from either the names following
         the bedragen line or the functie following the functiegegevens line. Outputs a list of dfs filtered by keywords and a list of dfs
-        filtered by exactly matching the 1a table"""
+        filtered by exactly matching the 1a table."""
         dfs_linestrat = self.extract_tables_from_page(pdf_path,page_number,y_tolerance,column_strategy,horizontal_strategy="lines")
         dfs_textstrat = self.extract_tables_from_page(pdf_path,page_number,y_tolerance,column_strategy,horizontal_strategy="text")
         #filter out irrelevant rows based on keywords
@@ -59,7 +63,9 @@ class better_match():
         exact_dfs = [df for df in exact_dfs if len(df) >= min_rows and df.shape[1] >= min_cols]
         return keywords_dfs, exact_dfs
     
-    def extract_tables_from_page(self,pdf_path:str, page_number:int, y_tolerance = 5,column_strategy = "name",horizontal_strategy = "lines") -> tuple[pd.DataFrame,bool]:
+    def extract_tables_from_page(self,pdf_path:str, page_number:int, y_tolerance: int = 5,column_strategy: str = "name",horizontal_strategy: str = "lines") -> list[pd.DataFrame]:
+        """based on the strategy (either names or function), this method will infer columns that a WNT table on this page might have. It then passes the column
+            lines it found to PymuPDF's tablefinder, which can infer rows and table bounds"""
         # read pdf document
         pdf_document = fitz.open(pdf_path)
 
@@ -169,7 +175,11 @@ class better_match():
         return extracted_dfs
             
         
-    def guess_columns_name(self,words_df,start_x, x_threshold):
+    def guess_columns_name(self,words_df: pd.DataFrame,start_x: float, x_threshold: float) -> list[float]:
+        """Given a dataframe with the location of words and the row they belong to, infer a column whenever the distance
+        between two words is greater than the x_threshold. This method bases the inference on names following the bedragen x € 1 row. 
+
+        """
         suggested_columns = []
         names = []
         potential_name = ""
@@ -187,7 +197,10 @@ class better_match():
         names.append(potential_name)
         return suggested_columns
 
-    def guess_columns_functiegegevens(self,words_df,start_x, x_threshold):
+    def guess_columns_functiegegevens(self,words_df: pd.DataFrame,start_x: float, x_threshold: float) -> list[float]:
+        """Given a dataframe with the location of words and the row they belong to, infer a column whenever the distance
+        between two words is greater than the x_threshold. This method bases the inference on functies following the functiegegevens row.
+        """
         suggested_columns = []
         functie_names = []
         potential_functie = ""
@@ -205,7 +218,9 @@ class better_match():
         functie_names.append(potential_functie)
         return suggested_columns
     
-    def process_dfs(self,dfs):
+    def process_dfs(self,dfs: list[pd.DataFrame]) -> list[pd.DataFrame]:
+        """filters dataframes by the first column containing this class's keywords
+        """
         filtered_dfs = []  # List to store filtered DataFrames
 
         for df in dfs:
@@ -222,7 +237,9 @@ class better_match():
             
         return filtered_dfs
     
-    def filter_exact_dfs(self, dfs):
+    def filter_exact_dfs(self, dfs : list[pd.DataFrame]) -> list[pd.DataFrame]:
+        """filters dataframes by the first column exactly matching the class's exact_match strings
+        """
         filtered_dfs = []  # List to store filtered DataFrames
 
         for df in dfs:
@@ -237,15 +254,5 @@ class better_match():
             filtered_dfs.append(filtered_df)
             
         return filtered_dfs
-if __name__ == "__main__":
-    # Example usage
-        pdf_path = "src_phase3/pdfs/testTables.pdf"
-        better_matcher = better_exact_match()
-        better_matcher.extract_tables_from_page(pdf_path,1,horizontal_strategy="text")
-        
-        # print(output_dataframe)
-    
 
-        # Save the DataFrame to a CSV file
-        # output_dataframe[0].to_csv("test_exact", index=False)
             
