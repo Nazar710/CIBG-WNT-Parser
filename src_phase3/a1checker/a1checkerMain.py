@@ -9,6 +9,9 @@ from .pdfWrapper import PDF_wrapper
 
 
 class pdf():
+    """
+    temporary container, storing information related to the pdf
+    """
     def __init__(self,path:str,file_name:str,tables:list[tuple[int,pd.DataFrame]]=None) -> None:
         self.path = path 
         self.file_name = file_name
@@ -18,10 +21,16 @@ class pdf():
             self.tables = tables 
 
     def append(self,obj:pd.DataFrame,page_num:int) -> None:
+        """
+        append found table to the table list and stores the page number on which it was found
+        """
         self.tables.append((obj,page_num))
 
 
 class extractor():
+    """
+    class related to reading in pdf files and extracting tables
+    """
     def __init__(self,table_settings:dict={}) -> None:
         self.table_settings = table_settings
         
@@ -42,9 +51,9 @@ class extractor():
             # page_nums = [table_and_page[1] for table_and_page in table_pagenum_list]
             return table_pagenum_list
 
-    def extract(self,folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]):
+    def extract(self,folder_name:str="example_pdfs",accepted_formats:list[str]=["pdf"]) -> list[pdf]:
         """
-        goes over all the pdfs in the specified folder and returns pdf objects
+        goes over all the pdfs in the specified folder and returns pdf objects list (where object describes the found tables on each page)
         """
         pdfsobj_list = []
 
@@ -64,7 +73,11 @@ class extractor():
             
         return pdfsobj_list
 
-    def extractFromPathList(self,paths:list[str]):
+    def extractFromPathList(self,paths:list[str]) -> list[pdf]:
+        """
+        process pdf's from a list of paths to the files.
+        will extract the table and return a list of 
+        """
         pdfsobj_list = []
 
         for path in paths:
@@ -104,6 +117,9 @@ class extractor():
             yield None, None 
 
 class a1checker():
+    """
+    checks for perfect match with a1 table
+    """
     def __init__(self) -> None:
         self.data_points = [
         "Naam",
@@ -157,6 +173,9 @@ class a1checker():
     
     
     def is1aOrNot(self,pdfObj:pdf,threshold:float,minNumRowsMatched:int=10,method_name:str="1a checker") -> PDF_wrapper:
+        """
+        Checks if a pdf object has 1a or not. It's an 1a if 1a table is discovered. 
+        """
         file_name = pdfObj.file_name
         path = pdfObj.path
         wrappedPDFobj  = PDF_wrapper(file_name,path)
